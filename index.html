@@ -1,0 +1,1027 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}</style></head><body>
+<title>触って覚える！ 手技・物品マスター</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Barlow+Semi+Condensed:wght@400;500;600;700&family=M+PLUS+Rounded+1c:wght@400;500;700;800&display=swap">
+<style>
+/* 「触って覚える！」シリーズの見た目。こどもの人工呼吸器トレーニング（ポップのテーマ）に合わせる。
+   丸ゴシック・クリームの地・太い紺の輪郭線・下側の厚み（リップ）・章ごとの色の帯。
+   図（iframe と物品の図）はライトテーマ固定で、色はそのまま。 */
+:root{
+  color-scheme:light;
+  --body:#FFF3E4;
+  --deck:linear-gradient(168deg,#FFEFD6 0%,#FFE0EC 46%,#E3ECFF 100%);
+  --bg:#FFF3E4; --sheet:#FFFFFF; --panel2:#FFF8EE;
+  --ink:#262745; --ink-2:#55577A; --ink-3:#767898; --faint:#A4A6C2; --line:#F0DFD0;
+  --accent:#FF5E8A; --accent-t:#D63A6C; --accent-soft:#FFF0F4;   /* 進む・選択（-t は文字用の濃い色） */
+  --blue:#5B7CFA; --blue-soft:#EEF2FF;
+  --blood:#E0334F; --blood-soft:#FFECEF;
+  --ok:#0B8F66; --ok-soft:#E8FBF3; --ok-br:#9FE9CE; --warn:#B86A00; --warn-soft:#FFF4DE;
+  --steel:#9aa5b4; --clear:#F4F0FA;
+  --gline:#2E2545; --glip:#C3B4D6;      /* 輪郭線と下側の厚み */
+  --chap:#5B7CFA;
+  --f-display:"M PLUS Rounded 1c","Hiragino Maru Gothic ProN","Hiragino Sans","Noto Sans JP",system-ui,sans-serif;
+  --f-body:"M PLUS Rounded 1c","Hiragino Maru Gothic ProN","Hiragino Sans","Noto Sans JP",system-ui,sans-serif;
+  --f-mono:"Barlow Semi Condensed","Roboto Condensed","Helvetica Neue",Arial,sans-serif;
+  --f-logo:"Dela Gothic One","M PLUS Rounded 1c","Hiragino Maru Gothic ProN",sans-serif;
+  --r:18px;
+}
+/* 章ごとの色（ゲームの ch1〜ch4 と同じ） */
+[data-chap="0"]{--chap:#4FA8FF} [data-chap="1"]{--chap:#12C48B} [data-chap="2"]{--chap:#8B6BFF} [data-chap="3"]{--chap:#FF5E8A}
+*{box-sizing:border-box}
+html{background:var(--body)}
+html,body{min-height:100%}
+body{margin:0;background:var(--deck) fixed;background-color:var(--body);color:var(--ink);font:500 15px/1.7 var(--f-body);-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%}
+button{font:inherit;color:inherit;touch-action:manipulation;-webkit-touch-callout:none}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.wrap{max-width:560px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 96px}
+h1,h2,h3{font-family:var(--f-display);font-weight:800;text-wrap:balance;margin:0;line-height:1.35}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-weight:600}
+
+/* 輪郭線＋厚みの板（ゲームの .lesson / .case / .mbtn と同じ文法） */
+.sheet,.simcard,.list .item,.q .opts button,.choice button{border:3px solid var(--gline);box-shadow:0 4px 0 var(--glip)}
+
+/* ---------- 共通の小物 ---------- */
+.sndbtn{flex:none;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:#fff;border:3px solid var(--gline);box-shadow:0 3px 0 var(--glip);cursor:pointer;padding:0}
+.sndbtn:active{transform:translateY(3px);box-shadow:none}
+.sndbtn svg{width:20px;height:20px}
+.sndbtn[aria-pressed="false"]{background:#F1EEF6}
+
+/* ---------- タイトル ---------- */
+.title{position:fixed;inset:0;z-index:90;display:grid;place-items:center;overflow:auto;
+  padding:max(12px,env(safe-area-inset-top,0px)) 16px max(12px,env(safe-area-inset-bottom,0px));
+  /* bg_title_shugi.jpg（Codex で作る手技用の背景）があればそれを、無ければ人工呼吸器トレーニングの背景を使う */
+  background:url("assets/bg_title_shugi.jpg") center/cover no-repeat,#FFF1E4 url("assets/bg_title.jpg") center/cover no-repeat}
+.title::before{content:"";position:fixed;inset:0;background:linear-gradient(180deg,rgba(255,248,238,.30) 0%,rgba(255,240,244,.55) 55%,rgba(255,243,228,.82) 100%);pointer-events:none}
+.title[hidden]{display:none}
+.tstage{position:relative;width:min(440px,100%);display:flex;flex-direction:column;align-items:center;gap:10px}
+.tlogo{display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:4px;text-align:center}
+.tlogo .series{font:400 clamp(34px,10.5vw,50px)/1.1 var(--f-logo);color:#fff;letter-spacing:.02em;
+  -webkit-text-stroke:7px var(--gline);paint-order:stroke fill;text-shadow:0 5px 0 rgba(46,37,69,.35);white-space:nowrap}
+.tlogo .series .k1{color:#FFC53D}.tlogo .series .k2{color:#FF7FA4}.tlogo .series .k3{color:#4FD8B4}.tlogo .series .k4{color:#7FA0FF}
+.tlogo .name{display:inline-block;font:800 clamp(20px,6vw,26px)/1.2 var(--f-display);color:#fff;letter-spacing:.12em;
+  background:linear-gradient(180deg,#FF7FA4,#F0507F);border:3px solid var(--gline);border-radius:999px;padding:5px 22px 6px;
+  box-shadow:0 4px 0 rgba(46,37,69,.3);text-shadow:0 2px 0 rgba(46,37,69,.45)}
+.tlogo .logoimg{display:block;width:min(360px,92%);height:auto;filter:drop-shadow(0 5px 0 rgba(46,37,69,.25))}
+.tlogo:not(.has-img) .logoimg{display:none} .tlogo.has-img .series,.tlogo.has-img .name{display:none}
+.tlogo .tag{font-size:12px;font-weight:800;color:var(--ink-2);background:rgba(255,255,255,.85);border-radius:999px;padding:2px 12px}
+.tcast{display:flex;align-items:flex-end;justify-content:center;gap:0;width:100%;height:clamp(150px,27vh,230px)}
+.tcast img{display:block;height:100%;width:auto;filter:drop-shadow(0 8px 10px rgba(60,30,80,.28))}
+.tcast .tm{height:58%;margin-right:-14px;transform:translateY(-22%) rotate(-4deg);animation:puku 3.6s ease-in-out infinite}
+@keyframes puku{0%,100%{transform:translateY(-22%) rotate(-4deg) scale(.95)}45%{transform:translateY(-24%) rotate(-4deg) scale(1.05)}}
+.tsay{position:relative;font-size:13.5px;line-height:1.6;font-weight:700;color:var(--ink);text-align:center;background:#fff;
+  border:3px solid var(--gline);border-radius:18px;padding:9px 14px;max-width:100%;box-shadow:0 4px 0 rgba(46,37,69,.22)}
+.tsay::after{content:"";position:absolute;left:58%;top:-10px;width:14px;height:14px;background:#fff;border-left:3px solid var(--gline);border-top:3px solid var(--gline);transform:rotate(45deg)}
+.tmenu{display:flex;flex-direction:column;gap:9px;width:100%;margin-top:4px}
+.tbtn{display:flex;align-items:center;gap:12px;text-align:left;padding:9px 14px 9px 9px;border-radius:20px;width:100%;
+  background:#fff;border:3px solid var(--gline);box-shadow:0 5px 0 var(--glip);color:var(--ink);cursor:pointer;transition:transform .06s,box-shadow .06s}
+.tbtn:active{transform:translateY(5px);box-shadow:none}
+.tbtn img{flex:none;width:44px;height:44px}
+.tbtn b{display:block;font-size:16px;font-weight:800;line-height:1.3}
+.tbtn i{display:block;font-style:normal;font-size:12px;color:var(--ink-3);font-weight:700}
+.tbtn.go{background:linear-gradient(180deg,#FFC24D,#FF8A3D);box-shadow:0 5px 0 #C4560F;color:#fff}
+.tbtn.go b{text-shadow:0 2px 0 rgba(46,37,69,.4)} .tbtn.go i{color:#FFF4E4}
+.tfoot{display:flex;align-items:center;gap:10px;width:100%;margin-top:4px;background:rgba(255,255,255,.88);border:3px solid var(--gline);border-radius:999px;padding:5px 5px 5px 14px}
+.tprog{flex:1;height:12px;border-radius:999px;background:#F3E6EC;overflow:hidden;border:2px solid var(--gline)}
+.tprog i{display:block;height:100%;width:0;background:linear-gradient(90deg,#FF5E8A,#FFB020 45%,#12C48B)}
+.tpct{font:700 15px var(--f-mono);color:var(--ink-2);min-width:3em;text-align:right}
+@media(max-height:680px){.tcast{height:120px}.tsay{display:none}.tbtn{padding:6px 12px 6px 7px}.tbtn img{width:36px;height:36px}.tbtn i{display:none}}
+
+/* ---------- モーダル（ゲームのダイアログ） ---------- */
+.modal{position:fixed;inset:0;z-index:100;background:rgba(50,30,60,.42);display:flex;align-items:center;justify-content:center;padding:16px;animation:fadein .16s ease-out}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+.mbox{background:#fff;width:min(520px,100%);max-height:88%;overflow:auto;border:4px solid var(--gline);border-radius:26px;
+  box-shadow:0 10px 0 rgba(46,37,69,.18),0 26px 60px rgba(80,40,90,.35);animation:pop .2s cubic-bezier(.2,1.3,.5,1)}
+@keyframes pop{from{transform:scale(.94) translateY(8px);opacity:0}to{transform:none;opacity:1}}
+.mhead{position:sticky;top:0;display:flex;align-items:center;gap:10px;padding:12px 14px;background:linear-gradient(180deg,#FF7FA4,#F0507F);border-bottom:4px solid var(--gline)}
+.mhead h3{flex:1;color:#fff;font-size:17px;text-shadow:0 2px 0 rgba(46,37,69,.45)}
+.mhead button{padding:5px 14px;border-radius:999px;background:#fff;border:3px solid var(--gline);font-weight:800;font-size:13px;box-shadow:0 3px 0 rgba(46,37,69,.35);cursor:pointer}
+.mhead button:active{transform:translateY(3px);box-shadow:none}
+.mbody{padding:16px;background:linear-gradient(180deg,#FFF9F3,#FFF1F5);font-size:14px}
+.mbody p{margin:0 0 10px}
+
+/* ---------- 達成の演出 ---------- */
+#fx{position:fixed;inset:0;pointer-events:none;z-index:120;overflow:hidden}
+#fx i{position:absolute;width:9px;height:14px;border-radius:2px;will-change:transform,opacity;animation:fall 1.5s cubic-bezier(.2,.6,.5,1) forwards}
+@keyframes fall{0%{transform:translate3d(0,0,0) rotate(0);opacity:1}100%{transform:translate3d(var(--dx),var(--dy),0) rotate(var(--rot));opacity:0}}
+.toast{position:fixed;left:50%;top:18%;transform:translateX(-50%);z-index:130;pointer-events:none;display:flex;align-items:center;gap:10px;max-width:calc(100vw - 32px);
+  background:linear-gradient(135deg,#FF5E8A,#FFB020);color:#fff;font-weight:800;font-size:15px;line-height:1.35;border:3px solid var(--gline);
+  padding:6px 18px 6px 6px;border-radius:999px;box-shadow:0 10px 30px rgba(190,60,110,.35);animation:toast 2.2s ease-out forwards;text-shadow:0 2px 0 rgba(46,37,69,.35)}
+.toast .tface{width:44px;height:44px;border-radius:50%;background:#E8FBF3;overflow:hidden;flex:none;border:2px solid var(--gline)}
+.toast .tface img{display:block;width:100%;height:100%;object-fit:cover}
+@keyframes toast{0%{opacity:0;transform:translate(-50%,10px) scale(.9)}12%{opacity:1;transform:translate(-50%,0) scale(1)}80%{opacity:1;transform:translate(-50%,0) scale(1)}100%{opacity:0;transform:translate(-50%,-10px) scale(.98)}}
+/* マスコットの反応（正解・不正解・完了）。指の操作を邪魔しない */
+.puku{position:fixed;right:max(10px,env(safe-area-inset-right,0px));bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:110;width:92px;pointer-events:none;
+  filter:drop-shadow(0 6px 8px rgba(60,30,80,.28));animation:pukuIn 1.6s cubic-bezier(.2,1.3,.5,1) forwards}
+.puku img{display:block;width:100%;height:auto}
+@keyframes pukuIn{0%{opacity:0;transform:translateY(40px) scale(.7)}14%{opacity:1;transform:none}82%{opacity:1;transform:none}100%{opacity:0;transform:translateY(16px) scale(.92)}}
+
+/* ---------- いぶき先生の吹き出し ---------- */
+.coach{display:flex;gap:10px;align-items:flex-start;margin-top:12px}
+.cav{flex:none;width:46px;height:46px;border-radius:50%;overflow:hidden;background:#E8FBF3;border:3px solid var(--gline);box-shadow:0 3px 0 var(--glip)}
+.cav img{display:block;width:100%;height:100%;object-fit:cover}
+.cbub{position:relative;flex:1;min-width:0;background:var(--panel2);border:2.5px solid var(--gline);border-radius:16px;padding:8px 12px 9px;font-size:14px;line-height:1.65}
+.cbub::before{content:"";position:absolute;left:-9px;top:14px;width:12px;height:12px;background:var(--panel2);border-left:2.5px solid var(--gline);border-bottom:2.5px solid var(--gline);transform:rotate(45deg)}
+.cwho{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:800;letter-spacing:.04em;color:var(--chap);margin-bottom:1px}
+.cwho i{font-style:normal;color:#fff;background:var(--chap);border-radius:999px;padding:0 8px;font-size:10.5px}
+.coach.ok .cbub{background:var(--ok-soft)} .coach.ok .cbub::before{background:var(--ok-soft)}
+.coach.ng .cbub{background:var(--blood-soft)} .coach.ng .cbub::before{background:var(--blood-soft)}
+.coach.ok .cwho{color:var(--ok)} .coach.ng .cwho{color:var(--blood)}
+
+/* ---------- ヘッダー（手技の画面） ---------- */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:#fff;border-bottom:3px solid var(--gline);box-shadow:0 4px 0 rgba(46,37,69,.12)}
+.top::before{content:"";display:block;height:5px;background:var(--chap)}
+.top .wrap{padding-block:8px 10px;display:flex;flex-direction:column;gap:8px}
+.bar{display:flex;align-items:center;gap:8px}
+.back{flex:none;border:3px solid var(--gline);background:#fff;border-radius:999px;padding:3px 12px 3px 9px;color:var(--ink);font-weight:800;font-size:13px;cursor:pointer;box-shadow:0 3px 0 var(--glip)}
+.back:active{transform:translateY(3px);box-shadow:none}
+.bar h1{font-size:18px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.badge{flex:none;font:700 12px/1 var(--f-mono);letter-spacing:.04em;padding:5px 9px;border-radius:999px;background:var(--chap);color:#fff;border:2px solid var(--gline)}
+.badge:empty{display:none}
+.tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.tabs button{border:2.5px solid var(--gline);background:var(--panel2);border-radius:999px;padding:5px 4px;font-weight:800;font-size:14px;color:var(--ink-2);cursor:pointer;box-shadow:0 3px 0 var(--glip)}
+.tabs button:active{transform:translateY(3px);box-shadow:none}
+.tabs button[aria-selected="true"]{background:var(--chap);color:#fff;text-shadow:0 1px 0 rgba(46,37,69,.35)}
+
+/* ---------- ホーム ---------- */
+.home-hero{position:relative;margin-top:14px;padding:14px 120px 14px 16px;background:#fff;border:3px solid var(--gline);border-radius:22px;box-shadow:0 5px 0 var(--glip);overflow:hidden;min-height:150px}
+.home-hero .eyebrow{font:400 15px/1.2 var(--f-logo);color:var(--accent-t);letter-spacing:.02em}
+.home-hero h1{font-size:27px;margin-top:2px}
+.home-hero p{color:var(--ink-2);margin:6px 0 0;font-size:13.5px;line-height:1.6}
+.home-hero .hdoc{position:absolute;right:6px;bottom:-34px;height:190px;width:auto;pointer-events:none}
+.hrow{display:flex;gap:8px;margin-top:10px;align-items:center}
+.hbtn{border:3px solid var(--gline);background:var(--panel2);border-radius:999px;padding:3px 14px;font-weight:800;font-size:13px;cursor:pointer;box-shadow:0 3px 0 var(--glip)}
+.hbtn:active{transform:translateY(3px);box-shadow:none}
+.bigprog{display:flex;align-items:center;gap:10px;margin-top:10px}
+.bigprog .bar2{flex:1;height:16px;border-radius:999px;background:#fff;border:3px solid var(--gline);overflow:hidden}
+.bigprog .bar2 i{display:block;height:100%;background:linear-gradient(90deg,#FF5E8A,#FFB020 45%,#12C48B)}
+.bigprog .pct{font:700 18px var(--f-mono);flex:none}
+.cat{margin-top:22px}
+.cat h2{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:15px;color:#fff;background:var(--chap);border:3px solid var(--gline);border-radius:16px;padding:7px 12px;box-shadow:0 4px 0 rgba(46,37,69,.22);margin-bottom:10px;text-shadow:0 1px 0 rgba(46,37,69,.35)}
+.cat h2 .cdot{width:12px;height:12px;border-radius:50%;background:#fff;border:2px solid var(--gline);flex:none}
+.cat h2 .ccount{margin-left:auto;font:700 12px/1.4 var(--f-mono);color:var(--chap);background:#fff;border:2px solid var(--gline);border-radius:999px;padding:0 9px;text-shadow:none}
+.list{display:flex;flex-direction:column;gap:9px}
+.item{display:flex;align-items:center;gap:11px;padding:10px 12px 10px 10px;background:var(--sheet);border-radius:16px;text-align:left;width:100%;cursor:pointer;border-left-width:8px!important;border-left-color:var(--chap)!important;transition:transform .06s,box-shadow .06s}
+.item:active{transform:translateY(4px);box-shadow:none!important}
+.item[disabled]{cursor:default;opacity:.55}
+.item .ic{width:42px;height:42px;flex:none;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--chap) 14%,#fff);border:2px solid var(--gline)}
+.item .tx{flex:1;min-width:0}
+.item b{display:block;font-size:15px;font-weight:800;line-height:1.4}
+.item small{display:block;color:var(--ink-3);font-size:12px;line-height:1.5;font-weight:700}
+.item.done{background:linear-gradient(90deg,rgba(43,217,160,.14),#fff 70%)}
+.pill{font:700 12px var(--f-mono);padding:3px 9px;border-radius:99px;border:2px solid var(--gline);color:var(--ink-2);white-space:nowrap;background:#fff}
+.pill.go{background:var(--chap);color:#fff}
+.progress{display:block;height:8px;border-radius:999px;background:#F3E6EC;margin-top:5px;overflow:hidden;border:1.5px solid var(--gline)}
+.progress i{display:block;height:100%;background:linear-gradient(90deg,var(--chap),#FFC53D);width:0;transition:width .4s}
+
+/* ---------- 手技の中身 ---------- */
+.sec{padding-top:18px;display:flex;flex-direction:column;gap:16px}
+.sheet{background:var(--sheet);border-radius:var(--r);padding:16px}
+.sheet h2{font-size:17.5px}
+.sheet .lead{color:var(--ink-2);font-size:13.5px;margin:4px 0 0}
+.note{font-size:12.5px;color:var(--ink-3);line-height:1.6}
+
+/* device svg */
+.device{margin:12px -6px 0;overflow-x:auto}
+.device svg{display:block;width:100%;min-width:320px;height:auto}
+.part{cursor:pointer}
+.part:hover .pf,.part.on .pf{stroke:#1f4fd1;stroke-width:1.6}
+.pf{stroke:var(--ink-2);stroke-width:.8}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+.chip{border:2.5px solid var(--gline);background:#fff;border-radius:99px;padding:3px 12px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 2px 0 var(--glip)}
+.chip[aria-pressed="true"]{background:var(--blue);color:#fff}
+.info{margin-top:12px;padding:12px;border-radius:14px;background:var(--blue-soft);border:2.5px solid var(--gline);min-height:84px}
+.info b{display:block;font-family:var(--f-display);font-weight:800;font-size:15px}
+.info p{margin:2px 0 0;font-size:13.5px;color:var(--ink-2)}
+.ptiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px}
+.ptile{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 4px 8px;border:2.5px solid var(--gline);border-radius:14px;background:#f6f6f3;cursor:pointer;font-size:11.5px;font-weight:700;line-height:1.3;color:#1d2530;text-align:center;box-shadow:0 3px 0 var(--glip)}
+.ptile img,.ptile .pnone{width:100%;aspect-ratio:4/3;object-fit:contain;display:block}
+.ptile[aria-pressed="true"]{background:#E3EAFE;box-shadow:0 0 0 3px #1f4fd1}
+.pover{display:block;width:100%;height:auto;margin-top:12px;border-radius:14px;background:#f6f6f3;border:2.5px solid var(--gline)}
+.pfig{position:relative;margin-top:12px;border-radius:14px;background:#f6f6f3;overflow:hidden;border:2.5px solid var(--gline);-webkit-tap-highlight-color:transparent}
+.pfig>svg,.pfig>img{display:block;width:100%;height:auto}
+.pfig [data-k]{cursor:pointer}
+.plabel{position:absolute;left:0;top:0;padding:3px 10px;border-radius:99px;background:#1f4fd1;color:#fff;font-size:12.5px;font-weight:800;white-space:nowrap;pointer-events:none;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+.phint{position:absolute;right:8px;bottom:6px;font-size:11px;font-weight:700;color:#6b7380;pointer-events:none}
+.info .pbig{display:block;width:100%;max-height:260px;object-fit:contain;margin:-2px 0 8px;border-radius:10px;background:#f6f6f3}
+.toggle{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.btn{border:3px solid var(--gline);background:#fff;color:var(--ink);border-radius:999px;padding:8px 18px;font-weight:800;cursor:pointer;box-shadow:0 4px 0 var(--glip);transition:transform .06s,box-shadow .06s}
+.btn:active{transform:translateY(4px);box-shadow:none}
+.btn.solid{background:linear-gradient(180deg,#FFC24D,#FF8A3D);color:#fff;box-shadow:0 4px 0 #C4560F;text-shadow:0 2px 0 rgba(46,37,69,.4)}
+.btn:disabled{opacity:.4;cursor:default;transform:none}
+
+/* gauge table */
+.gtable{width:100%;border-collapse:collapse;font-size:13px}
+.gtable th{white-space:nowrap;font-weight:800;color:var(--ink-3);text-align:left;font-size:11.5px;padding:6px 4px;border-bottom:2px solid var(--line)}
+.gtable td:nth-child(-n+3){white-space:nowrap}
+.gtable.gen td{white-space:normal}.gtable.gen td:first-child{white-space:nowrap}.gtable.gen tr{cursor:default}
+.gtable td{padding:8px 4px;border-bottom:1.5px solid var(--line);vertical-align:top}
+.gtable td.mono{font-size:14px}
+.gtable tr.sel td{background:var(--accent-soft)}
+.gtable tr{cursor:pointer}
+.sw{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:6px;border:1.5px solid var(--gline)}
+.tablewrap{overflow-x:auto;margin-top:10px}
+
+/* checklist */
+.check{display:flex;flex-direction:column;gap:2px;margin-top:8px}
+.check label{display:flex;gap:10px;align-items:flex-start;padding:8px 2px;border-bottom:2px dashed var(--line);font-size:14px;cursor:pointer}
+.check input{width:20px;height:20px;margin-top:3px;accent-color:var(--ok);flex:none}
+.check small{display:block;color:var(--ink-3);font-size:12px}
+
+/* steps */
+.stepper{display:flex;gap:5px;margin-top:2px}
+.stepper i{flex:1;height:10px;border-radius:999px;background:#F3E6EC;border:2px solid var(--gline)}
+.stepper i.done{background:var(--chap)}
+.stepper i.now{background:#FFC53D}
+.stephead{display:flex;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap}
+.stepno{font:700 13px var(--f-mono);color:#fff;background:var(--chap);border:2px solid var(--gline);border-radius:999px;padding:1px 10px;letter-spacing:.04em}
+.stephead h2{font-size:20px}
+.do{margin:10px 0 0;padding-left:1.3em}
+.do li{margin:5px 0}
+.do li::marker{font-family:var(--f-mono);font-weight:700;color:var(--chap)}
+.upd{margin-top:10px;padding:10px 12px;border-radius:14px;background:var(--warn-soft);border:2.5px dashed #E0A040;font-size:13px}
+.upd b{color:var(--warn)}
+.simcard{border-radius:var(--r);overflow:hidden;background:var(--sheet)}
+.simhead{display:flex;flex-direction:column;padding:10px 16px 9px;border-bottom:3px solid var(--gline);background:linear-gradient(180deg,#fff,var(--panel2))}
+.simhead b{font-family:var(--f-display);font-weight:800;font-size:16px}
+.simhead span{font-size:12.5px;color:var(--ink-3);font-weight:700}
+.simcard iframe{display:block;width:100%;height:760px;border:0;background:#f2f2ef}
+#stepbox{scroll-margin-top:130px}
+.nav{display:flex;gap:10px;justify-content:space-between;margin-top:16px}
+.qask{margin-top:16px;font-weight:800;font-size:14.5px}
+.choice{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:10px}
+.choice button,.q .opts button{background:#fff;border-radius:14px;padding:9px 11px;text-align:left;font-size:13.5px;font-weight:700;cursor:pointer;border-width:2.5px!important;box-shadow:0 3px 0 var(--glip)!important;transition:transform .06s}
+.choice button:active,.q .opts button:active{transform:translateY(3px);box-shadow:none!important}
+.choice button.right,.q .opts button.right{background:var(--ok-soft);border-color:var(--ok)!important;color:var(--ok)}
+.choice button.wrong,.q .opts button.wrong{background:var(--blood-soft);border-color:var(--blood)!important;color:var(--blood)}
+.fb{min-height:1.4em}
+.fbwrap[hidden]{display:none}
+
+/* quiz */
+.q{display:flex;flex-direction:column;gap:8px}
+.q>b{font-size:14.5px}
+.q .opts{display:flex;flex-direction:column;gap:8px}
+.score{display:inline-block;margin-top:8px;font:700 20px var(--f-mono);color:var(--ink);background:var(--panel2);border:2.5px solid var(--gline);border-radius:999px;padding:0 14px}
+.q .coach{margin-top:4px}
+
+/* updates */
+.chg{display:flex;flex-direction:column;gap:6px;padding:14px 0;border-top:2px dashed var(--line)}
+.chg:first-of-type{border-top:0;padding-top:4px}
+.chg h3{font-size:15px}
+.chg .row{display:grid;grid-template-columns:3.4em minmax(0,1fr);gap:6px;font-size:13.5px}
+.chg .row span{font:600 11px var(--f-mono);padding-top:3px;color:var(--ink-3)}
+.chg .row.now span{color:var(--ok)}
+.chg .src{font-size:12px;color:var(--ink-3)}
+.chg .src a{color:#3557D6;font-weight:700}
+.kind{font:600 10.5px var(--f-mono);padding:2px 6px;border-radius:4px;background:var(--warn-soft);color:var(--warn);vertical-align:2px;margin-left:6px}
+.kind.add{background:var(--ok-soft);color:var(--ok)}
+.kind.same{background:var(--clear);color:var(--ink-3)}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}#fx{display:none}.toast,.puku{opacity:1}}
+</style>
+
+<div id="app"></div>
+<div id="fx" aria-hidden="true"></div>
+
+<!-- 手技ごとのデータ（web/data/<id>.js が window.SHUGI_MODS[id] を登録する） -->
+<script src="data/bvm.js"></script>
+<script src="data/oxygen.js"></script>
+<script src="data/airway.js"></script>
+<script src="data/foreign.js"></script>
+<script src="data/intubation.js"></script>
+<script src="data/monitor.js"></script>
+<script src="data/defib.js"></script>
+<script src="data/io.js"></script>
+<script src="data/ivset.js"></script>
+<script src="data/transfusion.js"></script>
+<script src="data/cvc.js"></script>
+<script src="data/aline.js"></script>
+<script src="data/forceps.js"></script>
+<script src="data/clamps.js"></script>
+<script src="data/scalpel.js"></script>
+<script src="data/scissors.js"></script>
+<script src="data/suture.js"></script>
+<script src="data/closure.js"></script>
+<script src="data/dressing.js"></script>
+<script src="data/hemostasis.js"></script>
+<script src="data/retractor.js"></script>
+<script src="data/injection.js"></script>
+<script src="data/culture.js"></script>
+<script src="data/abg.js"></script>
+<script src="data/syringe.js"></script>
+<script src="data/puncture.js"></script>
+<script src="data/specimen.js"></script>
+<script src="data/poct.js"></script>
+<script src="data/suction.js"></script>
+<script src="data/foley.js"></script>
+<script src="data/ngtube.js"></script>
+<script src="data/antisepsis.js"></script>
+<script src="data/enema.js"></script>
+<script src="data/bandage.js"></script>
+<script src="data/tape.js"></script>
+<script src="data/splint.js"></script>
+<script src="data/insulin.js"></script>
+<script src="data/chest.js"></script>
+<script src="data/hfnc.js"></script>
+<script src="data/nppv.js"></script>
+<script src="data/sga.js"></script>
+<script src="data/cart.js"></script>
+<script src="data/trach.js"></script>
+<script src="data/pump.js"></script>
+<script src="data/localanes.js"></script>
+<script src="data/drain.js"></script>
+<script src="data/ecg.js"></script>
+<script src="data/steth.js"></script>
+<script src="data/ppe.js"></script>
+<script src="data/sterile.js"></script>
+
+<!-- 「触って覚える！」シリーズ共通の音（人工呼吸器トレーニングと同じ sound.js / bgm.js） -->
+<script src="assets/sound.js"></script>
+<script src="assets/bgm.js"></script>
+<!-- ストーリー（病棟ローテーション）。データは story/story.js と story/ep<N>.js、描画は story/engine.js -->
+<script src="story/story.js"></script>
+<script src="story/engine.js"></script>
+
+<script>
+(() => {
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem("shugi:"+k); return v==null ? d : JSON.parse(v);}catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem("shugi:"+k, JSON.stringify(v)); }catch(e){} }
+};
+const haptic = (kind) => { try{ window.webkit?.messageHandlers?.haptic?.postMessage(kind||"light"); }catch(e){} };
+const $ = (s, el=document) => el.querySelector(s);
+const h = (html) => { const t=document.createElement("template"); t.innerHTML=html.trim(); return t.content; };
+
+/* ---------- 「触って覚える！」シリーズ：音・キャラクター・演出 ---------- */
+const SND = window.VentSound || { play(){}, enabled(){ return false; }, setEnabled(){} };
+const BGM = window.VentBGM || { want(){}, jingle(){ return false; }, refresh(){} };
+const sfx = (n) => { try{ SND.play(n); }catch(e){} };
+const ART = (n) => `assets/${n}.png`;
+const reduced = () => { try{ return matchMedia("(prefers-reduced-motion: reduce)").matches; }catch(e){ return false; } };
+// いぶき先生の吹き出し。mood: normal | happy | think | alert
+const coach = (mood, html, cls, tag) => `<div class="coach ${cls||""}"><span class="cav"><img src="${ART("face_"+mood)}" alt=""></span><div class="cbub"><span class="cwho">いぶき先生${tag?`<i>${tag}</i>`:""}</span><div class="ctx">${html}</div></div></div>`;
+const setCoach = (el, mood, cls) => { if(!el) return; el.className = "coach " + (cls||""); const im = el.querySelector(".cav img"); if(im) im.src = ART("face_"+mood); };
+// マスコット（ぷくぷく）の反応。mood: happy | sad | excited
+function puku(mood){
+  document.querySelectorAll(".puku").forEach(x=>x.remove());
+  const d=document.createElement("div"); d.className="puku"; d.setAttribute("aria-hidden","true");
+  d.innerHTML=`<img src="${ART("mascot_"+mood)}" alt="">`; document.body.appendChild(d);
+  setTimeout(()=>d.remove(), 1700);
+}
+const CONFETTI = ["#FF5E8A","#FFB020","#12C48B","#5B7CFA","#FF8A3D","#8B6BFF"];
+function confetti(n){
+  if(reduced()) return; const host=$("#fx"); if(!host) return;
+  const w=innerWidth, cx=w/2, cy=innerHeight*0.34;
+  for(let i=0;i<n;i++){ const p=document.createElement("i"), ang=Math.PI*2*i/n+Math.random()*.4, dist=90+Math.random()*190;
+    p.style.left=Math.round(cx+(Math.random()-.5)*120)+"px"; p.style.top=Math.round(cy)+"px"; p.style.background=CONFETTI[i%CONFETTI.length];
+    p.style.setProperty("--dx",Math.round(Math.cos(ang)*dist)+"px"); p.style.setProperty("--dy",Math.round(Math.abs(Math.sin(ang))*dist+180)+"px");
+    p.style.setProperty("--rot",Math.round(Math.random()*900-450)+"deg"); p.style.animationDelay=(Math.random()*.18).toFixed(2)+"s"; host.appendChild(p); }
+  setTimeout(()=>{ host.innerHTML=""; }, 2000);
+}
+function toast(msg, img){
+  const t=document.createElement("div"); t.className="toast"; t.setAttribute("role","status");
+  t.innerHTML=`<span class="tface"><img alt="" src="${img||ART("face_happy")}"></span><span></span>`; t.lastChild.textContent=msg;
+  document.body.appendChild(t); setTimeout(()=>t.remove(), 2300);
+}
+function celebrate(msg, jingle){ confetti(28); toast(msg); puku("excited"); if(!BGM.jingle(jingle||"chapter")) sfx("confirm"); }
+// 音のオン・オフ（sound.js が localStorage に保存する。オフにすると BGM も止まる）
+const SPK_ON = '<path d="M4 9v6h4l5 4V5L8 9z" fill="#2E2545"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" stroke="#2E2545" stroke-width="2.2" fill="none" stroke-linecap="round"/>';
+const SPK_OFF = '<path d="M4 9v6h4l5 4V5L8 9z" fill="#2E2545"/><path d="M16.5 9.5l5 5M21.5 9.5l-5 5" stroke="#E0334F" stroke-width="2.4" stroke-linecap="round"/>';
+const sndBtn = () => { const on=SND.enabled(); return `<button class="sndbtn" type="button" aria-pressed="${on}" aria-label="音" title="音 ${on?"オン":"オフ"}"><svg viewBox="0 0 24 24">${on?SPK_ON:SPK_OFF}</svg></button>`; };
+document.addEventListener("click", (e)=>{ const b=e.target.closest&&e.target.closest(".sndbtn"); if(!b) return;
+  SND.setEnabled(!SND.enabled()); BGM.refresh();
+  document.querySelectorAll(".sndbtn").forEach(x=>x.outerHTML=sndBtn()); });
+// 操作音：ボタンは柔らかい tap、タブ・部品の切り替えは硬い click（人工呼吸器トレーニングと同じ使い分け）。
+// 答えのボタンと「次へ」は、結果に合わせて別の音を鳴らすのでここでは鳴らさない。
+const QUIET = ".choice button,.q .opts button,[data-go],.sndbtn";
+const CLICKY = ".tabs button,.chip,.ptile,tr[data-g]";
+document.addEventListener("pointerdown", (e)=>{ const b=e.target.closest&&e.target.closest("button,tr[data-g]"); if(!b||b.disabled||b.matches(QUIET)) return; sfx(b.matches(CLICKY)?"click":"tap"); }, true);
+document.addEventListener("keydown", (e)=>{ if(e.key!=="Enter"&&e.key!==" ") return; const b=e.target.closest&&e.target.closest("button"); if(!b||b.disabled||b.matches(QUIET)) return; sfx(b.matches(CLICKY)?"click":"tap"); }, true);
+
+/* ---------- content ---------- */
+const CHAPTERS = [
+  {cat:"第1章 蘇生（気道・呼吸・循環）", items:[
+    {id:"bvm", name:"バッグ・バルブ・マスク換気", sub:"BVM・ジャクソンリース回路"},
+    {id:"oxygen", name:"酸素投与", sub:"鼻カニュラ・マスク・ベンチュリー・ボンベ"},
+    {id:"airway", name:"エアウェイ挿入", sub:"口咽頭・鼻咽頭エアウェイ"},
+    {id:"foreign", name:"気道異物の除去", sub:"喉頭鏡とマギール鉗子"},
+    {id:"intubation", name:"気管挿管", sub:"喉頭鏡・気管チューブ・スタイレット"},
+    {id:"monitor", name:"生体モニターの装着", sub:"心電図・SpO₂・年齢で決める上下限"},
+    {id:"defib", name:"除細動", sub:"AED・未就学児用パッド・4 J/kg"},
+    {id:"io", name:"骨髄路確保", sub:"骨髄針・脛骨近位"},
+    {id:"sga", name:"声門上器具", sub:"非膨張型・ラリンジアルマスク"},
+    {id:"hfnc", name:"高流量鼻カニュラ", sub:"乳児・2 L/kg・加温加湿"},
+    {id:"nppv", name:"NPPV", sub:"神経筋疾患・鼻マスク・皮膚保護"},
+    {id:"trach", name:"気管切開カニューレ", sub:"カフなし・首ひも・事故抜去"},
+    {id:"cart", name:"救急カート", sub:"小児・体重で準備・毎日の点検"}]},
+  {cat:"第2章 輸液・ライン", items:[
+    {id:"iv", name:"ルートキープ（末梢静脈路確保）", sub:"小児の留置針・穿刺から固定まで"},
+    {id:"ivset", name:"輸液セットの作り方", sub:"点滴筒・クレンメ・プライミング"},
+    {id:"transfusion", name:"輸血セット", sub:"輸血フィルター・加温"},
+    {id:"cvc", name:"中心静脈カテーテル", sub:"小児CVC・セルジンガー法・挿入長"},
+    {id:"aline", name:"動脈圧ライン", sub:"トランスデューサー・ゼロ点校正"},
+    {id:"pump", name:"輸液ポンプ・シリンジポンプ", sub:"流量設定・アラーム・サイフォニング"}]},
+  {cat:"第3章 小外科", items:[
+    {id:"forceps", name:"鑷子の使い分け", sub:"有鈎・無鈎・アドソン"},
+    {id:"clamps", name:"鉗子の使い分け", sub:"ペアン・コッヘル・モスキート"},
+    {id:"scalpel", name:"メスの使い方", sub:"円刃・尖刃・電気メス"},
+    {id:"scissors", name:"剪刀の使い分け", sub:"クーパー・メイヨー・メッツェンバウム"},
+    {id:"suture", name:"皮膚縫合", sub:"縫合針・持針器・縫合糸"},
+    {id:"closure", name:"ステープラーとテープで閉じる", sub:"スキンステープラー・皮膚接合用テープ"},
+    {id:"dressing", name:"創傷被覆材", sub:"フィルム・ハイドロコロイド・フォーム"},
+    {id:"hemostasis", name:"止血", sub:"電気凝固・硝酸銀"},
+    {id:"retractor", name:"創の観察", sub:"鉤・ゾンデ"},
+    {id:"localanes", name:"局所麻酔", sub:"浸潤麻酔・指ブロック・体重あたりの上限"},
+    {id:"drain", name:"閉鎖式ドレーン", sub:"吸引式（バルブ型・バッグ型）・排液の観察"}]},
+  {cat:"第4章 汎用器具", items:[
+    {id:"injection", name:"注射針と注射", sub:"注射針・カテラン針・翼状針"},
+    {id:"draw", name:"静脈採血", sub:"真空管・翼状針 22〜23G"},
+    {id:"culture", name:"血液培養", sub:"小児用ボトル・2セット採取"},
+    {id:"abg", name:"動脈血ガス採血", sub:"血ガスキット・微量シリンジ"},
+    {id:"syringe", name:"シリンジ", sub:"ルアーチップ・ロック・カテーテルチップ"},
+    {id:"puncture", name:"腰椎穿刺", sub:"腰椎穿刺針・骨髄穿刺針"},
+    {id:"specimen", name:"検体採取", sub:"綿棒・スピッツ・喀痰容器"},
+    {id:"poct", name:"迅速検査", sub:"簡易血糖測定・尿検査"},
+    {id:"suction", name:"吸引と導尿", sub:"吸引カテーテル・間欠的導尿"},
+    {id:"foley", name:"尿道カテーテル留置", sub:"持続的導尿カテーテル"},
+    {id:"ngtube", name:"胃管挿入", sub:"経鼻胃管・栄養チューブ"},
+    {id:"antisepsis", name:"消毒", sub:"ポビドンヨード・アルコール・クロルヘキシジン"},
+    {id:"enema", name:"浣腸", sub:"ディスポーザブル浣腸・高圧浣腸"},
+    {id:"bandage", name:"包帯", sub:"綿・伸縮・弾性包帯"},
+    {id:"tape", name:"テープ固定", sub:"テープの種類と貼り方"},
+    {id:"splint", name:"骨折固定", sub:"シーネ・ギプス・取り外しできる副子"},
+    {id:"insulin", name:"インスリン注射", sub:"ペン型注入器・4 mm針"},
+    {id:"chest", name:"胸腔ドレナージ", sub:"トロッカーカテーテル・水封と吸引圧"},
+    {id:"ecg", name:"12誘導心電図", sub:"電極の位置・小児の設定・付け間違い"},
+    {id:"steth", name:"聴診器", sub:"小児用・数えてから聴く・当てる場所"},
+    {id:"ppe", name:"個人防護具（PPE）", sub:"小児の感染症・着る順・脱ぐ順"},
+    {id:"sterile", name:"滅菌手袋・滅菌ガウン", sub:"清潔野の作り方・装着"}]}
+];
+const chapOf = (id) => Math.max(0, CHAPTERS.findIndex(c=>c.items.some(it=>it.id===id)));
+
+const PARTS = {
+  needle:["内針（ベベル）","ステンレス製の金属針。先端の斜めの刃面（ベベル）を上に向けて刺す。内針の先端は外筒の先端より1〜2 mmほど前に出ている。"],
+  cath:["外筒カテーテル","内針にかぶさった柔らかい樹脂のチューブ。内針を抜いたあと、これだけが静脈内に残る。"],
+  hub:["外筒ハブ（カラーコード）","輸液ラインをつなぐルアー接続部。色で太さがわかる。22Gは青。ウイング付きの製品は翼をテープで皮膚に固定する。"],
+  safety:["針刺し防止機構","内針を抜くと針先がシールドに収まる、または自動で格納される。作動を確かめてから針捨て容器へ。"],
+  chamber:["フラッシュバックチャンバー","内針の先端が静脈内に入ると、ここに逆血が見える。ただしこの時点で外筒の先端はまだ血管の外にあることが多い。"],
+  grip:["グリップ（内針ハブ）","親指と中指で持つ部分。穿刺中はここを持ち、外筒を送るときは動かさずに固定する。"],
+  cap:["フィルターキャップ","空気は通し、血液は通さない通気フィルター。逆血がチャンバーに入れるのはこのため。"]
+};
+
+const GAUGES = [
+  {g:"14G", od:"1.9–2.2", color:"#f08a1c", name:"オレンジ", use:"大量出血の急速大量輸液。子どもで使うことは少ない"},
+  {g:"16G", od:"1.6–1.8", color:"#9aa0a6", name:"グレー", use:"急速輸液（体の大きい思春期の子など）"},
+  {g:"18G", od:"1.2–1.3", color:"#1f8a4c", name:"緑", use:"急速輸液・輸血（太い静脈がとれるとき）"},
+  {g:"20G", od:"1.0–1.1", color:"#e98bb5", name:"ピンク", use:"輸液・輸血（年長児などで静脈が太いとき）"},
+  {g:"22G", od:"0.8–0.9", color:"#1f4fd1", name:"青", use:"子どもの輸液でよく使う。手背の静脈など"},
+  {g:"24G", od:"0.7", color:"#f2cf2e", name:"黄", use:"乳児・新生児・とても細い静脈。逆血が見えにくいことがある"}
+];
+
+const KIT = [
+  ["手指衛生・未滅菌手袋","消毒後に穿刺部位に触れないなら滅菌手袋でなくてよい"],
+  ["表面麻酔クリーム（指示があれば）","刺す約60分前に、候補の静脈に貼っておく"],
+  ["駆血帯","可能なら単回使用。患者ごとに清潔なものを使う"],
+  ["皮膚消毒薬","アルコール綿、またはクロルヘキシジンアルコール。施設の規定に従う"],
+  ["留置針","指示された太さ。予備も1本"],
+  ["延長チューブ・閉鎖式コネクタ","三方活栓は原則使わない。接続はロック式"],
+  ["プライミング済みの輸液ライン","小児用のセットやポンプ。指示の速度で準備する"],
+  ["透明ドレッシング・固定テープ","挿入部が見えるように覆う"],
+  ["シーネ（固定の板）","関節を固定する。きつくせず、指先が見えるように"],
+  ["気をそらす物・タオル","動画やおもちゃを年齢に合わせて。針を見たくない子はタオルで隠す"],
+  ["針捨て容器","手の届く場所に。リキャップしない"],
+  ["処置用シーツ・ガーゼ","内針を抜くときの逆流に備える"]
+];
+
+const STEPS = [
+  {t:"準備と確認", do:["リストバンドと、保護者（名乗れる子は本人）に言ってもらう氏名と生年月日で、指示と照らし合わせる","体重と指示（薬剤・速度・目的）を確かめ、指示された太さの留置針を用意する","表面麻酔クリームの指示があれば、刺す約60分前に候補の静脈に貼っておく","年齢に合わせて何をするかを説明し、本人の了解（アセント）を得る。保護者にそばにいてもらうかを聞く","物品をそろえ、針捨て容器を手の届く位置に置く"],
+   why:"子どもの静脈は細く、刺されるたびに処置がこわくなる。前もって痛みを減らし、1回で入れる準備をすることが、いちばんの痛み止めになる。",
+   q:{ask:"5歳の子に表面麻酔クリームを使う。いつ貼る？", opts:[["刺す約60分前",1],["刺す直前",0],["刺したあと",0],["子どもには使えない",0]], ok:"そのとおり。効くまでに時間がかかるので、前もって貼る。", ng:"クリームは効くまでに時間がかかる。刺す約60分前に貼っておく。"}},
+  {t:"血管を選ぶ", do:["利き手でない手の手背が第一。前腕や足背も使える","新生児・乳児では頭皮の静脈を使うこともある","駆血帯を中枢側に巻き、見て触って静脈を確かめる。細い腕を締めすぎない","関節の近くなら、シーネで固定できるかを考えて選ぶ","見えない・触れない静脈で、1人2回までで入らなければ交代する"],
+   why:"手背は固定しやすく、利き手でなければ遊びや食事のじゃまになりにくい。",
+   upd:"1人2回までとし、入らなければ経験者に代わる（RCH）。CDCは、小児では上肢・下肢、新生児・乳児では頭皮も使えるとしている。",
+   q:{ask:"右利きの5歳の子の末梢静脈路。第一に考える部位は？", opts:[["左手の手背",1],["右手の手背",0],["右手首の内側",0],["肘窩",0]], ok:"そのとおり。利き手でない手の手背が第一。", ng:"利き手でない手の手背が第一。手首の内側や肘窩は、曲げると滴下が止まりやすい。"}},
+  {t:"消毒する", do:["表面麻酔クリームをはがしてふき取る","手指衛生をして手袋をつける","穿刺部位を中心から外へ消毒し、完全に乾くまで待つ","消毒したあとは穿刺部位に触れない。触れたら消毒し直す"],
+   why:"消毒薬は乾くあいだに効く。濡れたまま刺すと効果が落ち、しみて痛みも増える。",
+   upd:"アルコール、ヨード、クロルヘキシジンアルコールのいずれかで消毒し、乾かしてから刺す。2か月未満の乳児へのクロルヘキシジンは推奨が出ていない（CDC）。施設の規定に従う。"},
+  {t:"穿刺から内針抜去まで", sim:true, do:["保護者に抱っこしてもらうなど起こした安楽な姿勢にし、介助者が手首と指をやさしく支える。動画などで気をそらし、針を見たくない子はタオルで隠す","3か月未満の乳児は、スクロースとおしゃぶりや授乳を使える","ベベルを上にして浅い角度（子どもでは10〜15°）で皮膚を貫き、静脈へ進める","逆血を確認したら止まり、針を寝かせて2〜3 mm進め、内針を動かさずに外筒だけを送り込む"],
+   why:"逆血は内針の先端が静脈に入った合図。外筒の先端はまだ少し手前にあるので、寝かせてもう少し進めないと外筒が血管壁にひっかかる。24Gのような細い針では、逆血がゆっくりか見えないこともある。上のFig 1をドラッグして確かめる（図は5歳の手背の一例で、15°で刺して8°に寝かせる）。",
+   q:{ask:"逆血が見えた直後、外筒の先端はどこにある？", opts:[["まだ血管の外にあることが多い",1],["内針と同じく静脈内",0],["静脈の向こう側の壁",0],["皮下脂肪には達していない",0]], ok:"そのとおり。だから寝かせて2 mmほど進めてから外筒を送る。", ng:"内針の先端と外筒の先端には段差がある。逆血の時点では外筒はまだ外にあることが多い。"}},
+  {t:"駆血を外し、つなぐ", do:["駆血帯を外す","外筒の先端より中枢側の皮膚を指で押さえて逆流を止め、内針を抜く","針刺し防止機構の作動を確認し、すぐ針捨て容器へ。抜いた内針を外筒に戻さない","延長チューブや輸液ラインをロック式でつなぐ。子どもが動いても外筒が抜けないよう、手は支えたままにする"],
+   why:"一度抜いた内針を外筒に戻すと、針先で外筒を切ってしまい、切れた断片が血管内に流れるおそれがある。",
+   upd:"現在は針刺し防止機構付きの製品が標準。作動を確かめてから廃棄する。"},
+  {t:"滴下と腫れを確かめる", do:["クレンメを開け（ポンプなら指示の速度で開始し）、滴下や逆血を確かめる","穿刺部の腫れ・赤み・冷感がないか見る。あれば血管外漏出を疑って止める","話せる子には痛みを聞く。話せない子は、泣き方や手を引っこめるしぐさを見る"],
+   why:"滴下はしても血管外に漏れていることがある。子どもは痛みをうまく言えないので、腫れと痛みは目と手で確かめる。",
+   q:{ask:"滴下はするが、手背の刺入部の上が腫れて冷たい。まずすることは？", opts:[["輸液を止める",1],["滴下を速めて様子をみる",0],["外筒をさらに押し込む",0],["固定テープを強く巻き直す",0]], ok:"そのとおり。血管外漏出を疑い、まず止めて抜去を考える。", ng:"腫れと冷感は血管外漏出のサイン。まず輸液を止める。"}},
+  {t:"固定と記録", do:["透明ドレッシングで、挿入部が見えるように覆う","シーネで関節を固定する。きつく巻かず、指先の色が見えるようにする","ループを作って延長チューブを固定し、引っ張られても抜けないようにする","挿入日時・ゲージ・部位・実施者・穿刺の回数を記録する","施設の決まった間隔で挿入部と指先を見る。不要になったら速やかに抜く"],
+   why:"子どもは腫れや締めつけを訴えにくい。挿入部と指先が見えていると、漏れや締めすぎに早く気づける。",
+   upd:"CDCは、小児の末梢カテーテルは臨床的に必要なときにだけ入れ替えるとしている。施設の規定に従う。"}
+];
+
+const QUIZ = [
+  {ask:"外筒を送り込もうとしたら抵抗がある。正しい対応は？", opts:[["無理に押さずに中止し、別の部位で刺し直す",1],["強く押し込む",0],["内針を少し戻してから外筒に再挿入する",0]], why:"無理に押すと外筒の先が折れる。内針の再挿入は外筒を切るので禁止。"},
+  {ask:"逆血を確認してすぐ、寝かせずに外筒を送った。起こりやすいのは？", opts:[["外筒が血管壁内にとどまる",1],["外筒が深く入りすぎる",0],["何も起きない",0]], why:"逆血の時点では外筒はまだ血管外。十分に進めずに外筒を押すと血管壁内に留置される。"},
+  {ask:"子どもの手背は静脈が浅い。刺入の角度は？", opts:[["10〜15°の浅い角度",1],["45°",0],["90°",0]], why:"浅い静脈を深い角度で刺すと、向こう側の壁まで突き抜けやすい。"},
+  {ask:"22Gのハブの色は？", opts:[["青",1],["ピンク",0],["緑",0],["黄",0]], why:"JIS T 3223（ISO 10555-5準拠）のカラーコード。20Gはピンク、18Gは緑、24Gは黄。"},
+  {ask:"手背の静脈路をシーネで固定する。正しいのは？", opts:[["きつく巻かず、指先の色が見えるようにする",1],["抜けないように指先まできつく巻く",0],["シーネは使わない",0]], why:"きつい固定は血流を妨げる。指先が見えていれば、色や腫れの変化に早く気づける。"},
+  {ask:"子どもで、1人の実施者が2回失敗した。次にすることは？", opts:[["経験者に代わるか、エコーガイドを検討する",1],["成功するまで同じ人が続ける",0],["押さえる人を増やして続ける",0]], why:"1人2回までとし、入らなければ交代する。何度も刺されると、子どもは処置そのものがこわくなる。"}
+];
+
+const UPDATES = [
+  {k:"add", h:"部位と準備", now:"利き手でない手の手背が第一。表面麻酔クリーム（リドカイン・プロピトカイン配合）は前もって貼る（60分）。遊びや動画で気をそらし、保護者の抱っこを勧め、針を見たくない子はタオルで隠す。3か月未満はスクロースとおしゃぶりか授乳。", src:[["RCH Melbourne: Intravenous access – Peripheral","https://www.rch.org.au/clinicalguide/guideline_index/Intravenous_access_Peripheral/"]]},
+  {k:"add", h:"表面麻酔クリームの上限", now:"静脈留置針の穿刺時の痛みに使える。小児の最大量と貼る時間は年齢と体重で決まる。1歳未満ではメトヘモグロビン血症の報告が多い。", src:[["PMDA：リドカイン・プロピトカイン配合クリーム 添付文書","https://www.pmda.go.jp/PmdaSearch/iyakuDetail/300089_1219800N1023_1_11"]]},
+  {k:"add", h:"穿刺は何回まで", now:"1人2回まで。入らなければ経験者に代わる。浅い静脈が見つからないときは、エコーガイドも検討する。", src:[["RCH Melbourne: Intravenous access – Peripheral","https://www.rch.org.au/clinicalguide/guideline_index/Intravenous_access_Peripheral/"],["Nickel B, et al. Infusion Therapy Standards of Practice, 9th ed. J Infus Nurs 2024","https://pubmed.ncbi.nlm.nih.gov/38211609/"]]},
+  {k:"add", h:"姿勢と抑制", now:"起こした安楽な姿勢で保護者に密着してもらい、処置に要る部分だけを支える。力ずくの抑制は勧めない。", src:[["RCH Melbourne: Procedural pain management 4.5.1 Physical strategies","https://www.rch.org.au/uploadedFiles/Main/Content/rchcpg/hospital_clinical_guideline_index/PPM%204.5.1%20physical%20strategies%20110416.pdf"]]},
+  {k:"chg", h:"刺入角と逆血後の操作", now:"子どもでは10〜15°の浅い角度で刺す。逆血を見たら寝かせて2〜3 mm進め、それから外筒だけを送る。細い針では逆血が見えにくいことがある。", src:[["RCH Melbourne: Intravenous access – Peripheral","https://www.rch.org.au/clinicalguide/guideline_index/Intravenous_access_Peripheral/"]]},
+  {k:"add", h:"子どもの部位と消毒", now:"小児では上肢・下肢、新生児・乳児では頭皮も使える。消毒はアルコール、ヨード、クロルヘキシジンアルコールのいずれかで、乾かしてから刺す。2か月未満の乳児へのクロルヘキシジンは推奨が出ていない。", src:[["CDC Guidelines for the Prevention of Intravascular Catheter-Related Infections (2011) Summary","https://cdc.gov/infection-control/hcp/intravascular-catheter-related-infections/summary-recommendations.html"]]},
+  {k:"chg", h:"いつ入れ替えるか", now:"小児の末梢カテーテルは、臨床的に必要なときにだけ入れ替える（CDC）。施設の規定に従う。", src:[["CDC Summary of Recommendations","https://cdc.gov/infection-control/hcp/intravascular-catheter-related-infections/summary-recommendations.html"]]},
+  {k:"add", h:"説明と了解（アセント）", now:"年齢・発達・理解に合わせて説明し、子どもの納得を得る。家族と離れるストレスを小さくする。", src:[["市立札幌病院：小児看護倫理指針","https://www.city.sapporo.jp/hospital/clinic/department/nurse/ethics/area/pediatrics.html"]]},
+  {k:"chg", h:"カラーコードの規格", now:"留置針の規格は JIS T 3223:2023（ISO 10555-5:2013 準拠）。ハブの色で太さを見分ける。太さは指示と静脈の太さで決める。", src:[["JIS T 3223:2023 プレビュー（日本規格協会）","https://webdesk.jsa.or.jp/preview/pre_jis_t_03223_000_000_2023_j_ed10_ch.pdf"]], note:"年齢ごとの太さの決まった表は確かめられなかった。施設の基準に従う。"},
+  {k:"same", h:"針刺し防止機構", now:"針刺し防止機構付きの製品が標準。作動を確かめて針捨て容器へ。抜いた内針は外筒に戻さない。", src:[["MSDマニュアル プロフェッショナル版：末梢静脈カテーテル挿入","https://www.msdmanuals.com/ja-jp/professional/21-救命医療/末梢静脈等の血管関連処置/末梢静脈カテーテル挿入"]]}
+];
+
+
+/* ---------- 静脈採血（真空管） ---------- */
+const DRAW_TUBES = [
+  ["1","生化学（血清）","凝固促進剤・分離剤","5回以上ゆっくり転倒混和"],
+  ["2","凝固","クエン酸Na（血液9：薬1）","規定量まで入れる"],
+  ["3","ヘパリン","ヘパリンNa／Li","5回以上転倒混和"],
+  ["4","血算","EDTA-2K","すぐに転倒混和"],
+  ["5","血糖","フッ化Na（解糖阻止）","5回以上転倒混和"]
+];
+const DRAW_NEEDLES = [
+  {g:"21G", od:"0.8", color:"#2f8a52", name:"緑", use:"年長児・思春期。太めで溶血しにくい"},
+  {g:"22G", od:"0.7", color:"#222", name:"黒", use:"年長児で標準"},
+  {g:"23G", od:"0.6", color:"#2f56c9", name:"青", use:"乳幼児。翼状針で使うことが多い"}
+];
+const DRAW_VOL = [
+  ["3.5 kg","約280 mL","約3 mL","約14 mL"],
+  ["10 kg","約800 mL","約8 mL","約40 mL"],
+  ["18 kg","約1440 mL","約14 mL","約72 mL"],
+  ["30 kg","約2400 mL","約24 mL","約120 mL"]
+];
+const DRAW_KIT = [
+  ["手指衛生・未滅菌手袋","手袋は患者ごとに替える"],
+  ["表面麻酔クリーム（指示があれば）","穿刺の約60分前に貼る。量と時間の上限は年齢と体重で決まる"],
+  ["駆血帯","穿刺部の中枢側に巻き、1分以内に外す"],
+  ["アルコール綿","アルコール過敏ならクロルヘキシジンかポビドンヨード"],
+  ["採血針（22G）とホルダー","年長児の一例。ホルダーは患者ごとに使い捨て"],
+  ["翼状針（23G）","乳幼児や手背の細い静脈で使う"],
+  ["採血管","指示の検査だけ。少ない量の管を、採る順に並べる"],
+  ["採血管立て","使う順に左から並べる"],
+  ["ガーゼ・止血テープ","抜針後に約5分押さえる"],
+  ["針捨て容器","手の届く位置に。リキャップしない"],
+  ["気をそらす物・タオル","おもちゃや絵本、動画など年齢に合わせて。針を見たくない子はタオルで隠す"],
+  ["肘枕・処置用シーツ","腕をまっすぐ伸ばして支える"]
+];
+const DRAW_STEPS = [
+  {t:"準備と確認", do:["リストバンドと、本人（名乗れる年齢なら）か保護者に言ってもらう氏名と生年月日を、検査の指示と照らし合わせる","指示の検査だけにしぼり、少ない量の採血管を採る順に並べる","表面麻酔クリームの指示があれば、穿刺の約60分前に貼っておく","年齢に合わせて何をするかを説明し、本人の了解（アセント）を得る。保護者にそばにいてもらうかを聞く","手指衛生をして手袋をつける"],
+   why:"子どもの総血液量は約75〜80 mL/kg（30 kgで約2.4 L）。採血の合計は24時間で総血液量の1〜5%までとする指針が多く、病気の子は低めにする。だから要る検査だけを、少ない量の管で採る。",
+   q:{ask:"4歳の子の採血前の本人確認。使うのは？", opts:[["リストバンドと、保護者に氏名と生年月日を言ってもらう",1],["「〇〇ちゃんですね」と聞いてうなずきを見る",0],["ベッドの名札を見る",0],["病室の番号で確認する",0]], ok:"そのとおり。自分で名乗れない子は、リストバンドと保護者に名乗ってもらって照合する。", ng:"「〇〇ちゃんですね」は違っても「うん」と返ってくる。リストバンドと、保護者に名乗ってもらって照合する。"}},
+  {t:"部位を選び、駆血する", do:["年長児は肘窩の橈側皮静脈か肘正中皮静脈を選ぶ。尺側の深い静脈は正中神経と上腕動脈が近いので避ける","乳幼児は手背などの見える静脈を、23Gの翼状針で採ることが多い","点滴をしている側の中枢や、傷・感染のある所は刺さない","駆血帯を穿刺部の中枢側に巻き、1分以内に終える。細い腕を締めすぎない","カリウムを測るときは、手を握ったり開いたりさせない"],
+   why:"長い駆血や手の開閉（パンピング）は、カリウムなどの値を見かけ上高くする。泣いて手を握りしめる子も多いので、駆血はできるだけ短くする。",
+   upd:"駆血は1分以内。パンピングはカリウムの偽高値の原因になる（JCCLS GP4-A3）。",
+   q:{ask:"10歳の子の肘窩で、神経損傷を避けるためになるべく選ばない静脈は？", opts:[["尺側皮静脈（小指側）",1],["橈側皮静脈（親指側）",0],["肘正中皮静脈",0],["どれも同じ",0]], ok:"そのとおり。尺側の深い部分は正中神経と上腕動脈が近い。", ng:"尺側皮静脈の近くには正中神経と上腕動脈が走る。橈側か正中を選ぶ。"}},
+  {t:"消毒する", do:["表面麻酔クリームを貼っていたらはがし、ふき取る","アルコール綿で穿刺部を消毒する。冷たいことを先に伝える","乾くまで待つ。濡れたまま刺すと痛く、溶血の原因にもなる","消毒したところには触れない"],
+   why:"アルコールは乾くあいだに効く。乾かずに刺すと、しみて痛いうえ検体に混ざることがある。"},
+  {t:"刺す", do:["起こした安楽な姿勢にし、保護者に寄り添ってもらう。介助者は肘の上下だけを支え、力ずくで押さえない","おもちゃや絵本、声かけで気をそらす。18か月までの乳児には、施設の手順でスクロースを使える","穿刺部の末梢側を親指で引いて皮膚を張り、ベベルを上にして20°以下の角度で刺す","ホルダーを持つ手を腕に軽く当てて針を固定する。子どもが大きく動いたら、無理をせず抜く","指先へ走るしびれや激痛を訴えたら、すぐ針を抜く"],
+   why:"押さえつけられた子ほど抵抗して動く。安心できる姿勢で気がそれていれば腕が動かず、針も安定する。角度が深いほど静脈を突き抜けやすい。上のFig 1で針の角度と深さを確かめる。",
+   q:{ask:"刺した瞬間、10歳の子が「指先がビリッとした」と言った。まずすることは？", opts:[["すぐに針を抜く",1],["少し針を引いて様子をみる",0],["そのまま採血を終える",0],["針を深く進める",0]], ok:"そのとおり。神経に触れた可能性がある。すぐ抜いて記録し、医師に伝える。", ng:"しびれや電撃痛は神経に触れたサイン。すぐに抜く。"}},
+  {t:"採血管を順に差す", do:["ホルダー採血では 生化学 → 凝固 → ヘパリン → 血算 → 血糖 の順が一般的。血液培養はこれらより先","指示の本数だけ差す。真空がなくなって血液が止まるまで待ち、凝固の管は規定量（血液9：薬1）を守る","抜いた管はすぐ5回以上ゆっくり転倒混和する。強く振ると溶血する","採血管の底が穿刺部より低くなるように持ち、逆流を防ぐ","翼状針では、1本目に凝固の管を使わない"],
+   why:"前の管の薬が針を伝って次の管に混ざる（キャリーオーバー）。EDTAが生化学の管に入ると、カリウムが高く、カルシウムが低く出る。翼状針はチューブ内の空気の分だけ1本目の量が減るので、量が大事な凝固の管は1本目にしない。",
+   upd:"ホルダー採血の順番は JCCLS GP4-A3（2019）に合わせた。米国のCLSI GP41は凝固を血清より先にしている。施設の手順に従う。",
+   q:{ask:"乳児を翼状針で採血するとき、1本目に使わないのは？", opts:[["凝固の管",1],["生化学の管",0],["血算の管",0],["どれでもよい",0]], ok:"そのとおり。チューブ内の空気の分だけ量が減り、血液と薬の比が崩れる。", ng:"翼状針の1本目はチューブ内の空気の分だけ量が減る。比率が大事な凝固の管は避ける。"}},
+  {t:"駆血を外し、針を抜く", do:["「もうすぐ終わるよ」と伝える","最後の採血管をホルダーから抜く","駆血帯を外す","ガーゼを軽く当てて針を抜き、すぐ押さえる","針はリキャップせず、安全カバーを倒してホルダーごと針捨て容器へ"],
+   why:"管を刺したまま駆血を外すと、管の中身が血管側へ逆流するおそれがある。だから順番は「管を抜く → 駆血を外す → 針を抜く」。",
+   q:{ask:"採血の終わり方で正しい順は？", opts:[["管を抜く → 駆血を外す → 針を抜く",1],["針を抜く → 駆血を外す → 管を抜く",0],["駆血を外す → 管を抜く → 針を抜く",0],["管を刺したまま針を抜く",0]], ok:"そのとおり。逆流を防ぎ、出血も少なくなる。", ng:"最後の管を抜いてから駆血を外し、それから針を抜く。"}},
+  {t:"止血と観察", do:["ガーゼの上から約5分押さえる。もまない。保護者や本人に押さえてもらってもよい","気分不良、冷や汗、顔色の変化（血管迷走神経反射）がないか見る。終わってもすぐ立たせない","がんばったことをほめ、終わったことをはっきり伝える","採血管にラベルを貼り、すぐ提出する。採った量も記録する"],
+   why:"もむと皮下出血が広がる。くり返し採血する子は、採った量を合計して上限を超えないようにする。"}
+];
+const DRAW_QUIZ = [
+  {ask:"駆血は何分以内に終える？", opts:[["1分以内",1],["3分以内",0],["5分以内",0]], why:"長い駆血は血液が濃縮され、カリウムやタンパクなどが見かけ上高くなる。"},
+  {ask:"ホルダー採血で、生化学と血算の管はどちらを先に採る？", opts:[["生化学",1],["血算",0],["どちらでもよい",0]], why:"血算の管のEDTAが生化学の管に混ざると、カリウムが高く、カルシウムが低く出る。"},
+  {ask:"カリウムを測る採血で、子どもが手を握ったり開いたりすると？", opts:[["カリウムが見かけ上高くなる",1],["カリウムが低くなる",0],["影響はない",0]], why:"パンピングで筋肉からカリウムが出る。駆血を短くし、手は軽く開いてもらう。"},
+  {ask:"30 kgの子の総血液量はおよそ？", opts:[["約2.4 L",1],["約1 L",0],["約5 L",0]], why:"子どもの総血液量は約75〜80 mL/kg。採血の合計は24時間で総血液量の1〜5%までとする指針が多い。"},
+  {ask:"採血をいやがる5歳の子。勧められるのは？", opts:[["起こして保護者に寄り添ってもらい、腕は要る所だけ支える",1],["何人かで全身を押さえつける",0],["保護者には部屋の外で待ってもらう",0]], why:"力ずくの抑制は勧められない。押さえられた子ほど抵抗する。安楽な姿勢と保護者の付き添いで、腕は肘の上下だけを支える。"},
+  {ask:"1歳の子の採血で一般的な針は？", opts:[["23Gの翼状針",1],["21Gの採血針とホルダー",0],["18Gの留置針",0]], why:"標準採血法では、成人から年長児は21・22G、乳幼児は23Gが一般的。"}
+];
+const DRAW_UPDATES = [
+  {h:"子どもの針の太さ", now:"成人から年長児は21Gか22G、乳幼児は23Gが一般的。乳幼児は翼状針で手背などの見える静脈から採ることが多い。", src:[["日本臨床検査医学会：標準採血法ガイドライン（GP4-A3）に基づく正しい採血法（2024）","https://www.jslm.org/books/guideline/2024/GL2024_03.pdf"],["Corneanu LE, et al. Peripheral Venipuncture in Pediatric Patients: A Mini-Review. J Clin Med 2025","https://pmc.ncbi.nlm.nih.gov/articles/PMC12471072"]]},
+  {h:"採血の量の上限", now:"子どもの総血液量は約75〜80 mL/kg。採血の合計は24時間で総血液量の1〜5%、8週間で10%までとする指針が多い。病気の子は低めにする。量の上限は施設の基準に従う。", src:[["Howie SRC. Blood sample volumes in child health research: review of safe limits. Bull WHO 2011;89:46-53","https://scielosp.org/article/bwho/2011.v89n1/46-53"]]},
+  {h:"説明と了解（アセント）", now:"年齢・発達・理解に合わせて説明し、子どもの納得を得る。家族と離れるストレスを小さくする。", src:[["市立札幌病院：小児看護倫理指針","https://www.city.sapporo.jp/hospital/clinic/department/nurse/ethics/area/pediatrics.html"]]},
+  {h:"姿勢と付き添い", now:"起こした安楽な姿勢で保護者に寄り添ってもらい、処置に要る部分だけを支える。力ずくの抑制は勧めない。", src:[["RCH Melbourne: Procedural pain management 4.5.1 Physical strategies","https://www.rch.org.au/uploadedFiles/Main/Content/rchcpg/hospital_clinical_guideline_index/PPM%204.5.1%20physical%20strategies%20110416.pdf"]]},
+  {h:"痛みを減らす", now:"表面麻酔クリーム（リドカイン・プロピトカイン配合）は注射針の穿刺の痛みに使える。小児の量と時間の上限は年齢と体重で決まり、1歳未満ではメトヘモグロビン血症に注意する。18か月までの乳児にはスクロースを処置の約2分前に使える。", src:[["PMDA：リドカイン・プロピトカイン配合クリーム 添付文書","https://www.pmda.go.jp/PmdaSearch/iyakuDetail/300089_1219800N1023_1_11"],["RCH Melbourne: Sucrose (oral) for procedural pain management in infants","https://www.rch.org.au/rchcpg/hospital_clinical_guideline_index/Sucrose_oral_for_procedural_pain_management_in_infants/"]]},
+  {h:"採血管の順番", now:"ホルダー採血では 生化学 → 凝固 → ヘパリン → 血算 → 血糖 が一般的。注射器で採って分注する場合は 凝固 → ヘパリン → 血算 → 血糖 → 生化学。翼状針では1本目に凝固の管を使わない。米国のCLSIは血液培養 → 凝固 → 血清 → ヘパリン → EDTA → フッ化Na としている。", src:[["日本臨床検査医学会：標準採血法ガイドライン（GP4-A3）に基づく正しい採血法（2024）","https://www.jslm.org/books/guideline/2024/GL2024_03.pdf"], ["CLSI: Order of Blood Draw Tubes and Additives（GP41）","https://clsi.org/about/blog/order-of-blood-draw-tubes-and-additives/"]]},
+  {h:"駆血と刺入角", now:"駆血は1分以内。カリウムを測るときはパンピングをさせない。深い血管でなければ20°以下で刺せる。", src:[["日本臨床検査医学会：標準採血法ガイドライン（GP4-A3）に基づく正しい採血法（2024）","https://www.jslm.org/books/guideline/2024/GL2024_03.pdf"]]},
+  {h:"消毒", now:"約80%エタノールか約70%イソプロパノールで消毒し、乾いてから刺す。アルコール過敏ならクロルヘキシジンかポビドンヨード。", src:[["日本臨床検査医学会：標準採血法ガイドライン（GP4-A3）に基づく正しい採血法（2024）","https://www.jslm.org/books/guideline/2024/GL2024_03.pdf"]]},
+  {h:"終わり方と廃棄", now:"最後の採血管を抜いてから駆血帯を外し、針を抜く。約5分押さえる。採血管は5回以上転倒混和する。ホルダー・針・手袋は患者ごとに替え、針はリキャップせずホルダーと一体で針捨て容器へ。", src:[["日本臨床検査医学会：標準採血法ガイドライン（GP4-A3）に基づく正しい採血法（2024）","https://www.jslm.org/books/guideline/2024/GL2024_03.pdf"]]}
+];
+
+const MODS = Object.assign({}, window.SHUGI_MODS || {}, {
+  iv:{title:"ルートキープ", badge:()=>"5歳 18kg", fig:["modules/iv-22g.html","Fig 1　5歳の子の手背に22G留置針を入れる"], figH:2037, figHint:"図をドラッグ、またはボタンで段階を進める。例は5歳・18 kgの子の左手の手背", steps:STEPS, quiz:QUIZ, updates:UPDATES, parts:()=>Parts(), quizLead:"子どもの静脈路でよくある失敗と、最新の推奨から出題します。"},
+  draw:{title:"静脈採血", badge:()=>"10歳 30kg", fig:["modules/venipuncture.html","Fig 1　10歳の子の真空管採血（22G）"], figH:1972, steps:DRAW_STEPS, quiz:DRAW_QUIZ, updates:DRAW_UPDATES, parts:()=>DrawParts(), quizLead:"子どもの採血でよくある間違いと、標準採血法から出題します。"}
+});
+const badgeOf = (m) => typeof m.badge === "function" ? m.badge() : (m.badge || "");
+const cur = () => MODS[state.view];
+/* ---------- views ---------- */
+let state = { view: store.get("view","home"), tab: store.get("tab","steps"), steps: store.get("steps",{}), gauge: store.get("gauge","22G"), part:"needle", done: store.get("doneBy",{}) };
+if(state.view!=="home" && !MODS[state.view]) state.view="home";
+const save = () => { store.set("view",state.view); store.set("tab",state.tab); store.set("steps",state.steps); store.set("gauge",state.gauge); store.set("doneBy",state.done); };
+const doneOf = (id) => state.done[id] || (state.done[id] = {});
+const app = $("#app");
+
+function render(){
+  app.replaceChildren(state.view==="home" ? Home() : Module());
+  save(); bgm();
+}
+// BGM：タイトルはタイトルの曲、一覧は昼の曲、手技を読んでいるあいだは流さない。最初に触るまでは鳴らない（bgm.js）。
+// iPhone ではブラウザが触るまで音を出させないので、最初に触ってから曲を伝える（触る前に AudioContext を作らない）。
+let touched = false;
+const bgm = () => { if(!touched) return; const SU=window.SHUGI_STORY_UI; if(SU&&SU.active()){ BGM.want(SU.track()); return; } BGM.want(titleEl && !titleEl.hidden ? "title" : state.view==="home" ? "day" : null); };
+document.addEventListener("pointerdown", ()=>{ if(!touched){ touched=true; bgm(); } }, { capture:true, passive:true });
+document.addEventListener("keydown", ()=>{ if(!touched){ touched=true; bgm(); } }, { capture:true, passive:true });
+const pctAll = () => { let n=0, d=0; CHAPTERS.forEach(c=>c.items.forEach(it=>{ const m=MODS[it.id]; if(!m) return; d+=m.steps.length; n+=Math.min(m.steps.length, Object.keys(doneOf(it.id)).length); })); return d ? Math.round(n/d*100) : 0; };
+const openMod = (id) => { haptic(); window.SHUGI_STORY_UI?.onOpenMod?.(id); state.view=id; state.tab="steps"; store.set("last",id); render(); scrollTo(0,0); };
+
+/* ---------- タイトル画面 ---------- */
+let titleEl = null;
+function showTitle(){
+  const last = store.get("last", null), lm = last && MODS[last];
+  const p = pctAll();
+  const SU = window.SHUGI_STORY_UI, sg = SU && SU.goInfo();   // ストーリーを最後に遊んでいたら、つづきからはストーリーへ
+  if(!titleEl){ titleEl=document.createElement("div"); titleEl.className="title"; titleEl.id="title"; document.body.appendChild(titleEl); }
+  titleEl.innerHTML = `<div class="tstage">
+    <div class="tlogo"><span class="tag">研修医と看護師のための手順理解</span>
+      <img class="logoimg" src="assets/logo_series2.png" alt="触って覚える！ 手技・物品マスター" onload="this.parentNode.classList.add('has-img')" onerror="this.remove()">
+      <div class="series" role="heading" aria-level="1"><span class="k1">触</span><span class="k2">っ</span><span class="k3">て</span><span class="k4">覚</span><span class="k1">え</span><span class="k2">る</span><span class="k3">！</span></div>
+      <span class="name">手技・物品マスター</span></div>
+    <div class="tcast"><img class="tm" src="${ART("mascot_happy")}" alt=""><img class="td" src="${ART("doctor_normal")}" alt="いぶき先生"></div>
+    <div class="tsay">はじめまして。指導医の いぶき先生です。<br>物品に触って、動かして、手技を覚えましょう。</div>
+    <div class="tmenu">
+      <button class="tbtn go" data-t="go"><img src="${ART("icon_go")}" alt=""><span><b>${sg?sg.b:lm?"つづきから":"はじめる"}</b><i>${sg?sg.i:lm?lm.title:"第1章 蘇生から順に"}</i></span></button>
+      ${SU?SU.titleButton():""}
+      <button class="tbtn" data-t="list"><img src="${ART("icon_course")}" alt=""><span><b>手技の一覧</b><i>4章・${CHAPTERS.reduce((n,c)=>n+c.items.length,0)}の手技</i></span></button>
+      <button class="tbtn" data-t="about"><img src="${ART("icon_about")}" alt=""><span><b>このアプリについて</b><i>使い方と内容の根拠</i></span></button>
+    </div>
+    <div class="tfoot"><div class="tprog"><i style="width:${p}%"></i></div><span class="tpct">${p}%</span>${sndBtn()}</div>
+  </div>`;
+  titleEl.hidden=false;
+  titleEl.querySelectorAll("[data-t]").forEach(b=>b.addEventListener("click",()=>{
+    const t=b.dataset.t;
+    if(t==="about"){ about(); return; }
+    hideTitle();
+    if(t==="story" && SU){ SU.open(); return; }
+    if(t==="go" && sg){ SU.resume(); return; }
+    if(t==="go" && lm) openMod(last); else { state.view="home"; render(); scrollTo(0,0); }
+  }));
+  bgm();
+}
+function hideTitle(){ if(titleEl) titleEl.hidden=true; bgm(); }
+function about(){
+  const m=document.createElement("div"); m.className="modal";
+  m.innerHTML=`<div class="mbox" role="dialog" aria-modal="true" aria-labelledby="abH"><div class="mhead"><h3 id="abH">このアプリについて</h3><button type="button">とじる</button></div>
+    <div class="mbody">${coach("happy","「触って覚える！」シリーズの手技編です。人工呼吸器トレーニングと同じように、触って動かして覚えます。")}
+    <p style="margin-top:12px"><b>手技</b>　図をドラッグして段階を進め、各ステップの問いに答えます。<br><b>物品</b>　図の部品をタップすると名前と役割が出ます。<br><b>確認</b>　よくある間違いから出題します。<br><b>根拠</b>　内容の根拠と出典です。</p>
+    <p class="note">内容は複数の成書と、2026年10月時点のガイドラインを参考に作成しています。実際の手技は施設の手順と製品の添付文書に従ってください。</p></div></div>`;
+  const close=()=>m.remove();
+  m.addEventListener("click",e=>{ if(e.target===m) close(); }); m.querySelector(".mhead button").addEventListener("click",close);
+  document.body.appendChild(m); m.querySelector(".mhead button").focus();
+}
+
+function Home(){
+  const pctOf = (id) => MODS[id] ? Math.round(Object.keys(doneOf(id)).length / MODS[id].steps.length * 100) : 0;
+  const ready = CHAPTERS.reduce((n,c)=>n+c.items.filter(it=>MODS[it.id]).length,0), all = CHAPTERS.reduce((n,c)=>n+c.items.length,0);
+  const pa = pctAll();
+  const f = h(`<div class="wrap">
+    <header class="home-hero"><div class="eyebrow">触って覚える！</div>
+    <h1>手技・物品マスター</h1><p>物品の部品を確かめ、指で動かして手技を覚える。<span class="mono" style="color:var(--ink-3)">${ready}/${all}</span></p>
+    <div class="hrow"><button class="hbtn" id="toTitle">タイトル</button>${sndBtn()}</div>
+    <img class="hdoc" src="${ART("doctor_normal")}" alt=""></header>
+    <div class="bigprog"><div class="bar2"><i style="width:${pa}%"></i></div><span class="pct">${pa}%</span></div>
+    ${CHAPTERS.map((c,ci)=>`<section class="cat" data-chap="${ci}"><h2><span class="cdot"></span>${c.cat}<span class="ccount">${c.items.filter(it=>MODS[it.id]&&pctOf(it.id)>=100).length}/${c.items.length}</span></h2><div class="list">${c.items.map(it=>{ const ok=!!MODS[it.id], p=ok?pctOf(it.id):0; return `
+      <button class="item${p>=100?" done":""}" data-id="${it.id}" ${ok?"":"disabled"}>
+        <span class="ic">${icon(it.id)}</span>
+        <span class="tx"><b>${it.name}</b><small>${it.sub}${window.SHUGI_STORY_UI?.exp(it.id)?' <span class="expd">現場で経験</span>':""}</small>${ok?`<span class="progress"><i style="width:${p}%"></i></span>`:""}</span>
+        <span class="pill ${ok?"go":""}">${ok?(p?p+"%":"はじめる"):"準備中"}</span>
+      </button>`;}).join("")}</div></section>`).join("")}
+    <p class="note" style="margin-top:22px">内容は複数の成書と、2026年10月時点のガイドラインを参考に作成しています。実際の手技は施設の手順と製品の添付文書に従ってください。</p>
+  </div>`);
+  f.querySelectorAll(".item[data-id]").forEach(b=>b.addEventListener("click",()=>{ if(b.disabled) return; openMod(b.dataset.id); }));
+  $("#toTitle",f).addEventListener("click",()=>showTitle());
+  return f;
+}
+
+function icon(id){
+  const c="var(--gline)";
+  if(id==="draw") return `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.6" stroke-linecap="round"><rect x="9" y="3" width="6" height="18" rx="3"/><path d="M9 7h6"/><path d="M10 14h4v5a2 2 0 0 1-4 0z" fill="${c}" stroke="none"/></svg>`;
+  if(id==="iv") return `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.6" stroke-linecap="round"><path d="M3 21l6-6"/><rect x="8" y="9" width="5" height="5" rx="1" transform="rotate(-45 10.5 11.5)"/><path d="M13 11l7-7M17 4h3v3"/></svg>`;
+  if(MODS[id]?.icon) return `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${MODS[id].icon}</svg>`;
+  return `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--ink-3)" stroke-width="1.6"><circle cx="12" cy="12" r="7"/></svg>`;
+}
+
+function Module(){
+  const tabs=[["steps","手技"],["parts","物品"],["quiz","確認"],["news","根拠"]];
+  const f = h(`<div data-chap="${chapOf(state.view)}">
+    <div class="top"><div class="wrap">
+      <div class="bar"><button class="back" id="back">${window.SHUGI_STORY_UI?.retLabel()||"‹ 一覧"}</button><h1>${cur().title}</h1><span class="badge">${badgeOf(cur())}</span>${sndBtn()}</div>
+      <div class="tabs" role="tablist">${tabs.map(([k,l])=>`<button role="tab" data-tab="${k}" aria-selected="${state.tab===k}">${l}</button>`).join("")}</div>
+    </div></div>
+    <main class="wrap" id="body"></main></div>`);
+  $("#back",f).addEventListener("click",()=>{ if(window.SHUGI_STORY_UI?.back()){ state.view="home"; render(); return; } state.view="home"; render(); scrollTo(0,0); });
+  f.querySelectorAll("[data-tab]").forEach(b=>b.addEventListener("click",()=>{ state.tab=b.dataset.tab; haptic(); render(); }));
+  const body=$("#body",f);
+  const parts = typeof cur().parts === "function" ? cur().parts : () => GenericParts(cur().parts, state.view);
+  body.append({parts,steps:Steps,quiz:Quiz,news:News}[state.tab]());
+  return f;
+}
+
+function deviceSVG(color, flash, slide){
+  // side view, tip at left. units ~ px.
+  const off = slide ? -26 : 0; // catheter advanced relative to needle
+  return `<svg viewBox="0 0 360 132" role="img" aria-label="留置針の側面図。部品をタップすると説明が出る">
+    <defs><linearGradient id="steel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--line)"/><stop offset=".5" stop-color="var(--steel)"/><stop offset="1" stop-color="var(--ink-3)"/></linearGradient></defs>
+    <line x1="10" y1="104" x2="350" y2="104" stroke="var(--line)"/>
+    ${[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16].map(i=>`<line x1="${22+i*20}" y1="104" x2="${22+i*20}" y2="${i%5?100:96}" stroke="var(--ink-3)" stroke-width=".6"/>`).join("")}
+    <text x="22" y="118" font-family="IBM Plex Mono,monospace" font-size="8" fill="var(--ink-3)">0</text>
+    <text x="118" y="118" font-family="IBM Plex Mono,monospace" font-size="8" fill="var(--ink-3)">5 mm/目盛</text>
+    <g class="part ${state.part==="needle"?"on":""}" data-part="needle">
+      <path class="pf" d="M22 60 L38 56.5 L262 56.5 L262 61.5 L38 61.5 Z" fill="url(#steel)"/>
+      <rect x="18" y="44" width="30" height="30" fill="transparent"/>
+    </g>
+    <g style="transform:translateX(${off}px);transition:transform .6s cubic-bezier(.32,.72,0,1)">
+      <g class="part ${state.part==="cath"?"on":""}" data-part="cath">
+        <path class="pf" d="M40 57 L46 54 L150 52 L150 66 L46 64 L40 61 Z" fill="color-mix(in srgb, ${color} 22%, var(--sheet))" fill-opacity=".85"/>
+      </g>
+      <g class="part ${state.part==="hub"?"on":""}" data-part="hub">
+        <path class="pf" d="M150 50 L190 46 L190 72 L150 68 Z" fill="${color}"/>
+        <path class="pf" d="M158 49 L178 22 L188 22 L184 47 Z" fill="${color}" fill-opacity=".8"/>
+        <path class="pf" d="M158 69 L178 96 L188 96 L184 71 Z" fill="${color}" fill-opacity=".55"/>
+      </g>
+    </g>
+    <g class="part ${state.part==="safety"?"on":""}" data-part="safety">
+      <rect class="pf" x="192" y="47" width="10" height="24" rx="2" fill="var(--clear)"/>
+    </g>
+    <g class="part ${state.part==="chamber"?"on":""}" data-part="chamber">
+      <rect class="pf" x="204" y="48" width="48" height="22" rx="3" fill="var(--clear)" fill-opacity=".9"/>
+      <rect x="206" y="51" width="${flash?44:0}" height="16" rx="2" fill="var(--blood)" style="transition:width 1.2s ease-out"/>
+    </g>
+    <g class="part ${state.part==="grip"?"on":""}" data-part="grip">
+      <path class="pf" d="M252 46 L312 44 L312 74 L252 72 Z" fill="var(--sheet)"/>
+      ${[0,1,2,3,4,5,6,7,8].map(i=>`<line x1="${262+i*6}" y1="47" x2="${262+i*6}" y2="71" stroke="var(--ink-3)" stroke-width=".6"/>`).join("")}
+    </g>
+    <g class="part ${state.part==="cap"?"on":""}" data-part="cap">
+      <rect class="pf" x="312" y="50" width="18" height="18" rx="3" fill="var(--line)"/>
+    </g>
+    <g font-family="IBM Plex Mono,monospace" font-size="8.5" fill="var(--ink-2)">
+      <line x1="22" y1="40" x2="${40+off}" y2="40" stroke="var(--blood)" stroke-width="1"/>
+      <line x1="22" y1="36" x2="22" y2="44" stroke="var(--blood)"/><line x1="${40+off}" y1="36" x2="${40+off}" y2="44" stroke="var(--blood)"/>
+      <text x="${slide?0:22}" y="31" fill="var(--blood)">${slide?"外筒が針先を越えた":"段差 約1–2 mm"}</text>
+    </g>
+  </svg>`;
+}
+
+function Parts(){
+  const g = GAUGES.find(x=>x.g===state.gauge)||GAUGES[4];
+  let flash=false, slide=false;
+  const f = h(`<div class="sec">
+    <section class="sheet"><h2>留置針の部品</h2><p class="lead">部品をタップすると名前と役割が出ます。</p>
+      <div class="device" id="dev"></div>
+      <div class="chips" id="pchips">${Object.entries(PARTS).map(([k,v])=>`<button class="chip" data-p="${k}" aria-pressed="${state.part===k}">${v[0].replace(/（.*）/,"")}</button>`).join("")}</div>
+      <div class="info" id="pinfo" role="status"></div>
+      <div class="toggle"><button class="btn" id="flash">逆血を見る</button><button class="btn" id="slide">外筒を送る</button></div>
+    </section>
+    <section class="sheet"><h2>太さの選び方</h2><p class="lead">ゲージの数字が小さいほど太い。行をタップすると上の図の色が変わります。</p>
+      <div class="tablewrap"><table class="gtable"><thead><tr><th>ゲージ</th><th>外径 mm</th><th>色</th><th>主な用途</th></tr></thead>
+      <tbody>${GAUGES.map(x=>`<tr data-g="${x.g}" class="${x.g===state.gauge?"sel":""}"><td class="mono"><b>${x.g}</b></td><td class="mono">${x.od}</td><td><span class="sw" style="background:${x.color}"></span>${x.name}</td><td>${x.use}</td></tr>`).join("")}</tbody></table></div>
+      <p class="note">外径と色は JIS T 3223（ISO 10555-5 準拠）。子どもでは指示された太さを使う（年齢ごとの決まった表はなく、目的と静脈の太さで決める）。流れる量は内径の4乗に比例し、長さに反比例する。同じゲージでも製品により長さと流量は異なるので、添付文書で確認する。</p>
+    </section>
+    <section class="sheet"><h2>そろえる物品</h2><p class="lead">チェックはこの端末に保存されます。</p>
+      <div class="check">${KIT.map((k,i)=>`<label><input type="checkbox" id="kit${i}" ${store.get("kit"+i,false)?"checked":""}><span>${k[0]}<small>${k[1]}</small></span></label>`).join("")}</div>
+    </section></div>`);
+  const dev=$("#dev",f), info=$("#pinfo",f);
+  const draw=()=>{ dev.innerHTML=deviceSVG(g.color,flash,slide); const p=PARTS[state.part]; info.innerHTML=`<b>${p[0]}</b><p>${p[1]}</p>`;
+    dev.querySelectorAll("[data-part]").forEach(el=>el.addEventListener("click",()=>pick(el.dataset.part))); };
+  const pick=(k)=>{ state.part=k; haptic(); f2.querySelectorAll("[data-p]").forEach(c=>c.setAttribute("aria-pressed",String(c.dataset.p===k))); draw(); };
+  const f2=f.firstElementChild;
+  f.querySelectorAll("[data-p]").forEach(c=>c.addEventListener("click",()=>pick(c.dataset.p)));
+  $("#flash",f).addEventListener("click",(e)=>{ flash=!flash; e.target.textContent=flash?"逆血を戻す":"逆血を見る"; if(flash){state.part="chamber"; pick("chamber");} else draw(); });
+  $("#slide",f).addEventListener("click",(e)=>{ slide=!slide; e.target.textContent=slide?"元に戻す":"外筒を送る"; state.part="cath"; pick("cath"); });
+  f.querySelectorAll("tr[data-g]").forEach(r=>r.addEventListener("click",()=>{ state.gauge=r.dataset.g; haptic(); render(); }));
+  f.querySelectorAll(".check input").forEach((c,i)=>c.addEventListener("change",()=>store.set("kit"+i,c.checked)));
+  draw();
+  return f;
+}
+
+
+function DrawParts(){
+  const P=[["採血針","両端に針がある。前の針で静脈を刺し、後ろの針はゴムのカバーの中で採血管の栓を刺す。針基の色で太さがわかる。年長児は21・22G（図は22G＝黒）","parts/draw/needle.svg"],
+    ["ホルダー","採血針をねじ込み、後ろから採血管を差す筒。患者ごとに使い捨てる","parts/draw/holder.svg"],
+    ["生化学の採血管","真空採血管は中が減圧されていて、決まった量が入ると止まる。子どもには少ない量の管を使う。分離剤入り（キャップの色は一例）","parts/draw/tube-serum.svg"],
+    ["凝固の採血管","クエン酸Na入り。血液と薬の比が大事なので線まで入れる（色は一例）","parts/draw/tube-citrate.svg"],
+    ["血算の採血管","EDTA入り。採ったらすぐに転倒混和する（色は一例）","parts/draw/tube-edta.svg"],
+    ["血糖の採血管","フッ化Na入りで解糖を止める（色は一例）","parts/draw/tube-fluoride.svg"],
+    ["翼状針","羽根を持って浅い角度で刺せる。乳幼児や手背の細い静脈で使う（図は23G＝青）。チューブの先にホルダーをつなぐ","parts/draw/butterfly.svg"],
+    ["駆血帯","穿刺部より中枢側に巻いて静脈をふくらませる。ボタンを押すと外れる。細い腕を締めすぎない","parts/draw/tourniquet.svg"],
+    ["針捨て容器","抜いた針はリキャップせず、ホルダーごとすぐに入れる","parts/draw/sharps.svg"]];
+  const big=(it)=>`<img class="pbig" src="${it[2]}" alt="${it[0]}"><b>${it[0]}</b><p>${it[1]}</p>`;
+  const f=h(`<div class="sec">
+    <section class="sheet" data-cards="0"><h2>物品</h2><p class="lead">タップすると名前と役割が出ます。</p>
+      ${pfigHTML({pic:"parts/draw/lineup.svg", pfig:"parts/draw/lineup.js", h:"物品"})}
+      <div class="ptiles">${P.map((it,k)=>`<button class="ptile" data-k="${k}" aria-pressed="${k===0}"><img src="${it[2]}" alt="" loading="lazy"><span>${it[0].replace(/（.*）/,"")}</span></button>`).join("")}</div>
+      <div class="info" role="status">${big(P[0])}</div></section>
+    <section class="sheet"><h2>採血管の順番</h2><p class="lead">ホルダー採血の一般的な順です。子どもは指示の検査だけを採ります。血液培養を採るときはこれより先に採ります。</p>
+      <div class="tablewrap"><table class="gtable"><thead><tr><th>順</th><th>検査</th><th>添加剤</th><th>注意</th></tr></thead>
+      <tbody>${DRAW_TUBES.map(r=>`<tr><td class="mono"><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join("")}</tbody></table></div>
+      <p class="note">キャップの色は製品によって違うので、施設で使っている採血管の表で確認する。注射器で採って分注するときは順番が変わる（根拠タブ）。</p>
+    </section>
+    <section class="sheet"><h2>体重と採血量の上限</h2><p class="lead">子どもは採れる血液の量に上限があります。総血液量は約75〜80 mL/kg（下は80 mL/kgで計算）。</p>
+      <div class="tablewrap"><table class="gtable"><thead><tr><th>体重</th><th>総血液量</th><th>その1%</th><th>その5%</th></tr></thead>
+      <tbody>${DRAW_VOL.map(r=>`<tr><td class="mono"><b>${r[0]}</b></td><td class="mono">${r[1]}</td><td class="mono">${r[2]}</td><td class="mono">${r[3]}</td></tr>`).join("")}</tbody></table></div>
+      <p class="note">採血の合計は24時間で総血液量の1〜5%、8週間で10%までとする指針が多い（Howie 2011）。病気の子は低めにする。新生児の総血液量はこれより多い。上限は施設の基準に従う。</p>
+    </section>
+    <section class="sheet"><h2>針の太さ</h2><p class="lead">年長児は21・22G、乳幼児は23Gが一般的です（標準採血法）。</p>
+      <div class="tablewrap"><table class="gtable"><thead><tr><th>ゲージ</th><th>外径 mm</th><th>針基の色</th><th>使いどころ</th></tr></thead>
+      <tbody>${DRAW_NEEDLES.map(x=>`<tr><td class="mono"><b>${x.g}</b></td><td class="mono">${x.od}</td><td><span class="sw" style="background:${x.color}"></span>${x.name}</td><td>${x.use}</td></tr>`).join("")}</tbody></table></div>
+      <p class="note">針基の色は ISO 6009 のカラーコード。細すぎる針は溶血の原因になる。</p>
+    </section>
+    <section class="sheet"><h2>そろえる物品</h2><p class="lead">チェックはこの端末に保存されます。</p>
+      <div class="check">${DRAW_KIT.map((k,i)=>`<label><input type="checkbox" id="dkit${i}" ${store.get("dkit"+i,false)?"checked":""}><span>${k[0]}<small>${k[1]}</small></span></label>`).join("")}</div>
+    </section></div>`);
+  f.querySelectorAll(".check input").forEach((c,i)=>c.addEventListener("change",()=>store.set("dkit"+i,c.checked)));
+  const sec=f.querySelector("[data-cards]"), info=sec.querySelector(".info");
+  const pick=(k)=>{
+    haptic(); sec.querySelectorAll(".ptile").forEach(x=>x.setAttribute("aria-pressed",String(+x.dataset.k===k)));
+    info.innerHTML=big(P[k]); fig.show(k);
+  };
+  const fig=bindPfig(sec, P, pick);
+  sec.querySelectorAll(".ptile").forEach(c=>c.addEventListener("click",()=>pick(+c.dataset.k)));
+  return f;
+}
+
+/* 触れる図（物品タブ）。parts/<id>/<name>.js が window.SHUGI_PFIG["parts/<id>/<name>.js"] に SVG 文字列を登録する。
+   SVG の中の <g data-k="N"> が items[N]。タップするとその部品の色が変わり、名前が出る。読めないときは pic の静止画のまま。 */
+window.SHUGI_PFIG = window.SHUGI_PFIG || {};
+function loadPfig(src){
+  return new Promise((ok,ng)=>{
+    if(SHUGI_PFIG[src]) return ok(SHUGI_PFIG[src]);
+    const sc=document.createElement("script"); sc.src=src;
+    sc.onload=()=>SHUGI_PFIG[src]?ok(SHUGI_PFIG[src]):ng(); sc.onerror=ng; document.head.appendChild(sc);
+  });
+}
+const pfigHTML=(s)=> s.pfig ? `<div class="pfig" data-src="${s.pfig}">${s.pic?`<img src="${s.pic}" alt="${s.h||""}">`:""}<span class="plabel" hidden></span><span class="phint">部品をタップ</span></div>`
+  : (s.pic?`<img class="pover" src="${s.pic}" alt="${s.h||""}">`:"");
+let pfigSeq=0;
+function bindPfig(sec, items, pick){
+  const box=sec.querySelector(".pfig"); let cur=-1;
+  const api={ show(k){
+    cur=k; const svg=box&&box.querySelector("svg"); if(!svg) return;
+    const fid=svg.dataset.fid, lab=box.querySelector(".plabel");
+    svg.querySelectorAll("[data-k]").forEach(g=>{ const on=+g.dataset.k===k; g.style.filter = on ? `url(#${fid})` : ""; g.style.opacity = on ? "" : ".55"; });
+    const gs=[...svg.querySelectorAll(`[data-k="${k}"]`)];
+    if(!gs.length||!items[k]){ lab.hidden=true; return; }
+    box.querySelector(".phint").hidden=true;
+    const br=box.getBoundingClientRect(); let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
+    gs.forEach(g=>{ const r=g.getBoundingClientRect(); if(!r.width&&!r.height) return;
+      x0=Math.min(x0,r.left); y0=Math.min(y0,r.top); x1=Math.max(x1,r.right); y1=Math.max(y1,r.bottom); });
+    lab.textContent=items[k][0].replace(/（.*）/,""); lab.hidden=false;
+    if(x0>x1) return;
+    const w=lab.offsetWidth, hh=lab.offsetHeight, cx=(x0+x1)/2-br.left;
+    let top=y0-br.top-hh-6; if(top<4) top=Math.min(br.height-hh-4, y1-br.top+6);
+    lab.style.left=Math.max(4,Math.min(br.width-w-4,cx-w/2))+"px"; lab.style.top=top+"px";
+  }};
+  if(!box) return api;
+  loadPfig(box.dataset.src).then(txt=>{
+    const fid="pfhl"+(++pfigSeq);
+    // 同じページに図が何枚あっても id がぶつからないように、図ごとに接頭辞をつける
+    const ids=[...txt.matchAll(/\sid="([^"]+)"/g)].map(m=>m[1]);
+    for(const id of ids){ const e=id.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+      txt=txt.replace(new RegExp(`(\\sid=")${e}"|(url\\(#)${e}\\)|(href="#)${e}"`,"g"),(m,a,b,c)=> a?`${a}${fid}-${id}"`: b?`${b}${fid}-${id})`:`${c}${fid}-${id}"`); }
+    box.querySelector("img")?.remove(); box.insertAdjacentHTML("afterbegin", txt);
+    const svg=box.querySelector("svg");
+    svg.removeAttribute("width"); svg.removeAttribute("height"); svg.dataset.fid=fid;
+    // 明るさを保ったまま青く染める（#1f4fd1 〜 淡い青）
+    svg.insertAdjacentHTML("afterbegin", `<defs><filter id="${fid}" x="-20%" y="-20%" width="140%" height="140%" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="0.16 0.54 0.05 0 0.12  0.13 0.43 0.04 0 0.31  0.03 0.11 0.01 0 0.82  0 0 0 1 0" result="t"/><feMorphology in="SourceAlpha" operator="dilate" radius="1.5" result="d"/><feGaussianBlur in="d" stdDeviation="2" result="b"/><feFlood flood-color="#1f4fd1" flood-opacity=".55"/><feComposite in2="b" operator="in" result="g"/><feMerge><feMergeNode in="g"/><feMergeNode in="t"/></feMerge></filter></defs>`);
+    svg.addEventListener("click",e=>{ const g=e.target.closest("[data-k]"); if(g&&items[+g.dataset.k]) pick(+g.dataset.k); });
+    if(cur>=0) api.show(cur);
+  }).catch(()=>{});
+  addEventListener("resize",()=>{ if(cur>=0&&box.isConnected) api.show(cur); });
+  return api;
+}
+
+/* データファイルの parts（配列）を描く。
+   {type:"cards", h, lead, items:[[名前, 説明], ...]}       部品をタップして説明
+   {type:"table", h, lead, head:[...], rows:[[...], ...], note}  セル "#rrggbb|ラベル" は色見本つき
+   {type:"kit", h, lead, items:[[物品, 補足], ...]}         チェックリスト（端末に保存）
+   {type:"text", h, lead, html}                             短い説明 */
+function GenericParts(sections, id){
+  const cell = (c) => { const m = /^(#[0-9a-fA-F]{3,8})\|(.*)$/.exec(String(c)); return m ? `<span class="sw" style="background:${m[1]}"></span>${m[2]}` : c; };
+  const f = h(`<div class="sec">${sections.map((s,si)=>{
+    const head = `<h2>${s.h}</h2>${s.lead?`<p class="lead">${s.lead}</p>`:""}`;
+    if(s.type==="cards"){
+      const pics = s.items.some(it=>it[2]);
+      const big = (it)=> `${it[2]?`<img class="pbig" src="${it[2]}" alt="${it[0]}">`:""}<b>${it[0]}</b><p>${it[1]}</p>`;
+      return `<section class="sheet" data-cards="${si}">${head}
+      ${pfigHTML(s)}
+      ${pics
+        ? `<div class="ptiles">${s.items.map((it,k)=>`<button class="ptile" data-k="${k}" aria-pressed="${k===0}">${it[2]?`<img src="${it[2]}" alt="" loading="lazy">`:`<span class="pnone"></span>`}<span>${it[0].replace(/（.*）/,"")}</span></button>`).join("")}</div>`
+        : `<div class="chips">${s.items.map((it,k)=>`<button class="chip" data-k="${k}" aria-pressed="${k===0}">${it[0].replace(/（.*）/,"")}</button>`).join("")}</div>`}
+      <div class="info" role="status">${big(s.items[0])}</div></section>`;
+    }
+    if(s.type==="table") return `<section class="sheet">${head}<div class="tablewrap"><table class="gtable gen"><thead><tr>${s.head.map(x=>`<th>${x}</th>`).join("")}</tr></thead>
+      <tbody>${s.rows.map(r=>`<tr>${r.map((c,k)=>`<td class="${k===0?"mono":""}">${k===0?`<b>${cell(c)}</b>`:cell(c)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>${s.note?`<p class="note">${s.note}</p>`:""}</section>`;
+    if(s.type==="kit") return `<section class="sheet">${head||"<h2>そろえる物品</h2>"}<p class="lead">チェックはこの端末に保存されます。</p>
+      <div class="check">${s.items.map((k,i)=>`<label><input type="checkbox" data-kit="${id}:${si}:${i}" ${store.get("kit:"+id+":"+si+":"+i,false)?"checked":""}><span>${k[0]}<small>${k[1]||""}</small></span></label>`).join("")}</div></section>`;
+    return `<section class="sheet">${head}${s.html?`<div style="margin-top:8px;font-size:14px">${s.html}</div>`:""}</section>`;
+  }).join("")}</div>`);
+  f.querySelectorAll("[data-cards]").forEach(sec=>{
+    const items = sections[+sec.dataset.cards].items, info = sec.querySelector(".info");
+    const pick = (k)=>{
+      haptic(); sec.querySelectorAll(".chip,.ptile").forEach(x=>x.setAttribute("aria-pressed",String(+x.dataset.k===k)));
+      const it = items[k]; info.innerHTML = `${it[2]?`<img class="pbig" src="${it[2]}" alt="${it[0]}">`:""}<b>${it[0]}</b><p>${it[1]}</p>`;
+      fig.show(k);
+    };
+    const fig = bindPfig(sec, items, pick);
+    sec.querySelectorAll(".chip,.ptile").forEach(c=>c.addEventListener("click",()=>pick(+c.dataset.k)));
+  });
+  f.querySelectorAll("[data-kit]").forEach(c=>c.addEventListener("change",()=>store.set("kit:"+c.dataset.kit,c.checked)));
+  return f;
+}
+
+function Steps(){
+  const f=h(`<div class="sec">
+    <section class="simcard"><div class="simhead"><b>${cur().fig[1]}</b><span>${cur().figHint||"図をドラッグ、またはボタンで段階を進める"}</span></div>
+      <iframe src="${cur().fig[0]}" title="${cur().fig[1]}" style="height:${cur().figH||760}px"></iframe></section>
+    <section class="sheet" id="stepbox"></section></div>`);
+  const box=$("#stepbox",f), id=state.view, STEPS=cur().steps, done=doneOf(id);
+  // 図の高さを中身に合わせる（同一オリジンで読めるとき）。読めなければ figH のまま。
+  const ifr=$(".simcard iframe",f);
+  ifr.addEventListener("load",()=>{ try{
+    const d=ifr.contentDocument, fit=()=>{ const hh=d.documentElement.scrollHeight; if(hh>200) ifr.style.height=hh+"px"; };
+    fit(); new ResizeObserver(fit).observe(d.body);
+  }catch(e){} });
+  const draw=(scroll)=>{
+    const i=Math.max(0,Math.min(STEPS.length-1,state.steps[id]||0)), s=STEPS[i];
+    box.innerHTML=`<div class="stepper">${STEPS.map((_,k)=>`<i class="${k===i?"now":done[k]?"done":""}"></i>`).join("")}</div>
+    <div class="stephead"><span class="stepno">STEP ${i+1}/${STEPS.length}</span><h2>${s.t}</h2></div>
+    <ol class="do">${s.do.map(d=>`<li>${d}</li>`).join("")}</ol>
+    ${coach("normal", s.why, "why", "なぜ")}
+    ${s.upd?`<div class="upd"><b>最新の推奨：</b>${s.upd}</div>`:""}
+    ${s.q?`<div><div class="qask">${s.q.ask}</div><div class="choice">${s.q.opts.map((o,k)=>`<button data-k="${k}">${o[0]}</button>`).join("")}</div><div class="fbwrap" hidden>${coach("think", '<span class="fb" role="status"></span>')}</div></div>`:""}
+    <div class="nav"><button class="btn" data-go="-1" ${i===0?"disabled":""}>前へ</button><button class="btn solid" data-go="1">${i===STEPS.length-1?"完了":"次へ"}</button></div>`;
+    if(s.q) box.querySelectorAll(".choice button").forEach(b=>b.addEventListener("click",()=>{
+      const right=s.q.opts[+b.dataset.k][1]===1; b.classList.add(right?"right":"wrong"); haptic(right?"success":"error");
+      box.querySelector(".fb").textContent=right?s.q.ok:s.q.ng;
+      const fw=box.querySelector(".fbwrap"); fw.hidden=false; setCoach(fw.firstElementChild, right?"happy":"alert", right?"ok":"ng");
+      sfx(right?"confirm":"miss"); puku(right?"happy":"sad");
+    }));
+    box.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>{
+      if(+b.dataset.go>0){ done[i]=1; haptic("success"); if(i===STEPS.length-1){ celebrate(`${cur().title}　手技を完了！`, "chapter"); state.tab="quiz"; render(); scrollTo(0,0); return; } sfx("confirm"); } else sfx("tap");
+      state.steps[id]=i+(+b.dataset.go); save(); draw(true);
+    }));
+    if(scroll) box.scrollIntoView({behavior:"smooth",block:"start"});
+  };
+  draw(false);
+  return f;
+}
+
+function Quiz(){
+  let score=0, answered=0; const QUIZ=cur().quiz;
+  const f=h(`<div class="sec"><section class="sheet"><h2>確認問題</h2>${coach("normal", cur().quizLead||"")}<div class="score" id="sc">0 / ${QUIZ.length}</div></section>
+  ${QUIZ.map((q,i)=>`<section class="sheet q" data-q="${i}"><b>Q${i+1}. ${q.ask}</b><div class="opts">${q.opts.map((o,k)=>`<button data-k="${k}">${o[0]}</button>`).join("")}</div><div class="qwhy" hidden>${coach("think", q.why, "", "解説")}</div></section>`).join("")}</div>`);
+  f.querySelectorAll("[data-q]").forEach(sec=>{
+    const q=QUIZ[+sec.dataset.q];
+    sec.querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{
+      if(sec.dataset.done) return; sec.dataset.done=1; answered++;
+      const right=q.opts[+b.dataset.k][1]===1; if(right) score++;
+      b.classList.add(right?"right":"wrong"); if(!right) sec.querySelectorAll("button").forEach(x=>{ if(q.opts[+x.dataset.k][1]) x.classList.add("right"); });
+      const qw=sec.querySelector(".qwhy"); qw.hidden=false; setCoach(qw.firstElementChild, right?"happy":"think", right?"ok":"ng"); haptic(right?"success":"error");
+      document.getElementById("sc").textContent=`${score} / ${QUIZ.length}`+(answered===QUIZ.length?"　おつかれさまでした":"");
+      if(answered===QUIZ.length) celebrate(`確認問題 ${score} / ${QUIZ.length}　おつかれさまでした！`, "note");
+      else { sfx(right?"confirm":"miss"); puku(right?"happy":"sad"); }
+    }));
+  });
+  return f;
+}
+
+function News(){
+  const UPDATES=cur().updates;
+  return h(`<div class="sec"><section class="sheet"><h2>根拠と出典</h2>
+    <p class="lead">手技とクイズの内容の根拠です。2026年10月時点の資料で確認しました。</p>
+    ${UPDATES.map(u=>`<div class="chg"><h3>${u.h}</h3>
+      <div>${u.now}</div>
+      ${u.note?`<div class="note">${u.note}</div>`:""}
+      <div class="src">出典：${u.src.map(s=>`<a href="${s[1]}" target="_blank" rel="noopener">${s[0]}</a>`).join("／")}</div></div>`).join("")}
+  </section></div>`);
+}
+
+// ストーリー（story/engine.js）が使う道具。ストーリーはこれを通してだけ画面と音にさわる。
+window.SHUGI_APP = { MODS, CHAPTERS, ART, coach, setCoach, sfx, haptic, puku, celebrate, toast, sndBtn, icon, BGM, SND, openMod, showTitle, hideTitle, bgm };
+render();
+// 一覧から始まるときだけタイトルを出す。手技を開いたまま終わっていたら（shugi:view）その手技をそのまま開く。
+if(state.view==="home") showTitle();
+})();
+</script>
+</body></html>
