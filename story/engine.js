@@ -1112,10 +1112,11 @@
 
   /* ---------- index.html から呼ばれる入口 ---------- */
   function titleButton() {
-    return '<button class="tbtn" data-t="story"><img src="' + art('mascot_happy') + '" alt=""><span><b>ストーリー</b><i>' + esc(progressLabel()) + '</i></span></button>';
+    return '<button class="tbtn" data-t="story"><img src="' + art('mascot_happy') + '" alt=""><span><b>勤務表</b><i>' + (seen('prologue') ? '勤務を選んで遊ぶ・ふりかえる' : 'ストーリーの勤務の一覧') + '</i></span></button>';
   }
   function isLast() { return !!load(LKEY, null) && seen('prologue'); }
-  function goInfo() { return isLast() ? { b: 'つづきから', i: 'ストーリー　' + progressLabel() } : null; }
+  /* タイトルの「つづきから」はいつもストーリーの続き（2026-10-20 ユーザー）。下の「勤務表」は勤務を選ぶ入口。 */
+  function goInfo() { return seen('prologue') ? { b: 'つづきから', i: 'ストーリー　' + progressLabel() } : { b: 'はじめる', i: 'ストーリーのプロローグから' }; }
   function retLabel() { return RET ? (RET.hub ? '‹ 勤務表' : '‹ ストーリー') : ''; }
   function backFromMod() {
     if (!RET) return false;

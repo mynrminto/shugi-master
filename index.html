@@ -652,7 +652,7 @@ let titleEl = null;
 function showTitle(){
   const last = store.get("last", null), lm = last && MODS[last];
   const p = pctAll();
-  const SU = window.SHUGI_STORY_UI, sg = SU && SU.goInfo();   // ストーリーを最後に遊んでいたら、つづきからはストーリーへ
+  const SU = window.SHUGI_STORY_UI, sg = SU && SU.goInfo();   // つづきからは、いつもストーリーの続きへ（2026-10-20 ユーザー）
   if(!titleEl){ titleEl=document.createElement("div"); titleEl.className="title"; titleEl.id="title"; document.body.appendChild(titleEl); }
   titleEl.innerHTML = `<div class="tstage">
     <div class="tlogo"><span class="tag">研修医と看護師のための手順理解</span>
