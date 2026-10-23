@@ -738,7 +738,7 @@
     var mod = modOf(t.mod), spec = t.order || { steps: [] }, src = (mod && mod.steps) || [];
     return spec.steps.map(function (si, k) {
       var s = src[si] || { t: '（手順 ' + si + '）', do: [] };
-      return { si: si, t: (spec.labels && spec.labels[k]) || s.t, d: s.do || [] };
+      return { si: si, t: (spec.labels && spec.labels[k]) || s.t, d: (spec.dos && spec.dos[k]) || s.do || [] };
     });
   }
   function paintOrder(panel, t) {
