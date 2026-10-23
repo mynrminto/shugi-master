@@ -427,6 +427,19 @@
     for (var i = 0; i < end; i++) { var l = ls[i]; if (l && CAST[l.who] && l.who !== line.who && shows(l)) p = l; }
     return p;
   }
+  /* 家族・子ども・たける先生の立ち絵（assets/story/fam_<子>_<続柄>・kid_<子>・surg_takeru）。名前から決める。無ければ名札。 */
+  var KID_ID = { 'はる': 'haru', 'さくら': 'sakura', 'そうた': 'sota', 'けんた': 'kenta', 'ひな': 'hina', 'めい': 'mei', 'たくみ': 'takumi',
+    'れん': 'ren', 'だいち': 'daichi', 'かいと': 'kaito', 'あおい': 'aoi', 'みさき': 'misaki', 'ことね': 'kotone', 'しゅん': 'shun',
+    'りょう': 'ryo', 'みお': 'mio', 'ゆうと': 'yuto' };
+  var KIN_ID = { 'お母さん': 'mother', 'お父さん': 'father', 'おばあちゃん': 'grandma' };
+  function personArt(line) {
+    if (line.who === 'surg') return 'surg_takeru';
+    var m = /^(.+?)(?:くん|ちゃん)(?:の(.+))?$/.exec(line.name || ''), id = m && KID_ID[m[1]];
+    if (!id) return null;
+    if (line.who === 'pt' && !m[2]) return 'kid_' + id;
+    if (line.who === 'fam' && m[2] && KIN_ID[m[2]]) return 'fam_' + id + '_' + KIN_ID[m[2]];
+    return null;
+  }
   function figFor(line) {
     if (CAST[line.who]) {
       var pt = castPartner(line);
@@ -436,6 +449,8 @@
         '<span class="cs cs-doc' + (line.who === 'doc' ? ' on' : '') + '">' + castImg('doc', dm) + '</span>' };
     }
     if (line.who === 'puku') return { key: 'puku', html: '<img alt="" src="' + art('mascot_' + (/^(happy|excited|sad)$/.test(line.mood) ? line.mood : 'happy')) + '">', cls: 'mascot' };
+    var pic = sArt(personArt(line));
+    if (pic) return { key: line.who + ':' + (line.name || ''), cls: 'person', html: '<img alt="" src="' + pic + '">' };
     var bd = S.BADGE[line.who];
     if (bd) {
       var mark = bd.mark || String(line.name || '？').charAt(0);
@@ -1203,6 +1218,7 @@
       '.sfig.duo .cs:not(.on){filter:brightness(.72) saturate(.7);transform:scale(.93)}.sfig.duo .cs.on{z-index:1}',
       '.sfig.duo .cs.in{animation:sfigIn .35s cubic-bezier(.2,1.3,.4,1)}',
       '.sfig.nametag{height:auto;margin-bottom:40px}',
+      '.sfig.person{height:86%}',
       '.sbadge{display:flex;flex-direction:column;align-items:center;gap:6px}',
       '.sbadge b{display:grid;place-items:center;width:118px;height:118px;border-radius:50%;background:#fff;border:4px solid var(--gline);color:var(--bc);font:800 54px/1 var(--f-display);box-shadow:0 6px 0 rgba(46,37,69,.25),inset 0 0 0 8px color-mix(in srgb,var(--bc) 18%,#fff)}',
       '.sbadge i{font-style:normal;font-size:13px;font-weight:800;color:#fff;background:var(--bc);border:3px solid var(--gline);border-radius:999px;padding:2px 12px;white-space:nowrap}',

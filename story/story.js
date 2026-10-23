@@ -70,11 +70,16 @@
   S.ART = [
     'bg_story_night', 'bg_story_room', 'bg_story_station', 'bg_story_ward', 'cg_ep1', 'cg_ep10', 'cg_ep2',
     'cg_ep3', 'cg_ep4', 'cg_ep5', 'cg_ep6', 'cg_ep7', 'cg_ep8', 'cg_ep9', 'cg_epilogue', 'cg_prologue',
-    'pt_aoi', 'pt_daichi', 'pt_daichi_nppv', 'pt_haru', 'pt_haru_hfnc', 'pt_haru_ng', 'pt_hina',
-    'pt_hina_arrest', 'pt_hina_monitor', 'pt_hina_rosc', 'pt_kaito', 'pt_kaito_splint', 'pt_kenta',
-    'pt_kenta_tf', 'pt_kotone', 'pt_mei', 'pt_mio', 'pt_mio_lp', 'pt_misaki', 'pt_ren', 'pt_ren_lateral',
-    'pt_ryo', 'pt_ryo_lines', 'pt_sakura', 'pt_sakura_o2', 'pt_shun', 'pt_shun_drain', 'pt_sota',
-    'pt_sota_dka', 'pt_takumi', 'pt_takumi_foley', 'pt_yuto'
+    'fam_aoi_father', 'fam_daichi_father', 'fam_haru_mother', 'fam_hina_mother', 'fam_kaito_mother',
+    'fam_kenta_mother', 'fam_kotone_mother', 'fam_mei_father', 'fam_mio_father', 'fam_mio_mother',
+    'fam_misaki_mother', 'fam_ren_mother', 'fam_ryo_mother', 'fam_sakura_mother', 'fam_shun_mother',
+    'fam_sota_father', 'fam_sota_mother', 'fam_takumi_mother', 'fam_yuto_grandma', 'kid_aoi', 'kid_daichi',
+    'kid_hina', 'kid_kaito', 'kid_kenta', 'kid_kotone', 'kid_mei', 'kid_misaki', 'kid_sakura', 'kid_shun',
+    'kid_sota', 'kid_takumi', 'pt_aoi', 'pt_daichi', 'pt_daichi_nppv', 'pt_haru', 'pt_haru_hfnc',
+    'pt_haru_ng', 'pt_hina', 'pt_hina_arrest', 'pt_hina_monitor', 'pt_hina_rosc', 'pt_kaito',
+    'pt_kaito_splint', 'pt_kenta', 'pt_kenta_tf', 'pt_kotone', 'pt_mei', 'pt_mio', 'pt_mio_lp', 'pt_misaki',
+    'pt_ren', 'pt_ren_lateral', 'pt_ryo', 'pt_ryo_lines', 'pt_sakura', 'pt_sakura_o2', 'pt_shun',
+    'pt_shun_drain', 'pt_sota', 'pt_sota_dka', 'pt_takumi', 'pt_takumi_foley', 'pt_yuto', 'surg_takeru'
   ];
 
   /* 患者さんの状態（pt_<患者>_<状態> の <状態>）。絵が無いときの札に出す。 */
