@@ -131,6 +131,7 @@
     root.innerHTML =
       '<div class="sbg" id="sBg"></div>' +
       '<div class="stop"><span class="splace" id="sPlace"></span><span class="ssnd" id="sSnd"></span>' +
+      '<button class="sref" id="sRef" type="button" aria-haspopup="dialog" aria-label="資料を見る" hidden>' + REF_ICON + '資料</button>' +
       '<button class="sskip" id="sSkip" type="button">スキップ ▸▸</button><button class="sclose" id="sClose" type="button" aria-label="中断して勤務表へ">×</button></div>' +
       '<div class="sband" id="sBand" hidden></div>' +
       '<div class="sstage" id="sStage"></div>' +
@@ -144,7 +145,12 @@
     });
     q('#sSkip').addEventListener('click', function (ev) { ev.stopPropagation(); skip(); });
     q('#sClose').addEventListener('click', function (ev) { ev.stopPropagation(); closeBtn(); });
+    q('#sRef').addEventListener('click', function (ev) { ev.stopPropagation(); refOpen(); });
     document.addEventListener('keydown', function (ev) {
+      if (refIsOpen()) {
+        if (ev.key === 'Escape' || ev.key === 'Esc') { ev.preventDefault(); ev.stopPropagation(); refClose(); }
+        return;
+      }
       if (!root || root.hidden || !R || R.mode !== 'line') return;
       if (document.querySelector('.modal')) return;
       if (ev.target && /input|textarea/i.test(ev.target.tagName)) return;
@@ -162,6 +168,7 @@
   }
   function hide() {
     if (!root) return;
+    refClose(true);
     clearInterval(TY.timer); root.hidden = true;
     document.documentElement.style.overflow = '';
   }
@@ -364,6 +371,7 @@
     var t = task();
     q('#sPlace').textContent = placeText();
     q('#sSkip').hidden = !(b.k === 'lines' || b.k === 'card');
+    q('#sRef').hidden = !refMods().length;
     q('#sClose').setAttribute('aria-label', '中断して勤務表へ');
     card.hidden = true; box.hidden = true; panel.hidden = true; root.classList.remove('paneled');
     var was = R.mode;
@@ -950,7 +958,7 @@
     setBg('station', false);
     q('#sCard').hidden = true; q('#sBox').hidden = true; q('#sStage').innerHTML = '';
     q('#sBand').hidden = true; q('#sBand').innerHTML = ''; root.classList.remove('banded', 'carded');
-    q('#sSkip').hidden = true; q('#sPlace').textContent = 'ストーリー　病棟ローテーション';
+    q('#sSkip').hidden = true; q('#sRef').hidden = true; refClose(true); q('#sPlace').textContent = 'ストーリー　病棟ローテーション';
     q('#sClose').setAttribute('aria-label', 'タイトルへ');
     var panel = q('#sPanel'); panel.hidden = false; root.classList.add('paneled'); panel.scrollTop = 0;
     var role = S.ROLES[playerRole()], cur = currentEp();
@@ -1110,6 +1118,181 @@
     });
   }
 
+  /* ---------- 資料（ストーリーの途中で、この勤務の手技の資料を見る） ----------
+   * 上の帯の「資料」から開く覆い。ストーリーの画面（#story）の外に置き、R にも #story の中身にも触らない。
+   * なので閉じれば、同じ行・同じトレーの選択・同じ並べ途中にそのまま戻る（描き直さない）。
+   * 中身は手技の画面と同じ見た目：手順（t・do・why・upd）／物品（parts）／根拠（updates）／図（fig の iframe）。
+   * 判断の答えが分からないように、確認問題（quiz）と手順の問い（q・ok・ng）は出さない。保存はしない。 */
+  var REF_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M12 6.5C10 5 7 4.6 3.5 5v13c3.5-.4 6.5 0 8.5 1.5 2-1.5 5-1.9 8.5-1.5V5C17 4.6 14 5 12 6.5z"/><path d="M12 6.5v13"/></svg>';
+  var REF_TABS = [['steps', '手順'], ['parts', '物品'], ['news', '根拠'], ['fig', '図を見る']];
+  var RV = { el: null, mod: null, tab: 'steps', from: null };
+  function refIsOpen() { return !!(RV.el && !RV.el.hidden); }
+  /* この勤務の業務で使う手技（重なりなし、業務の順） */
+  function refMods() {
+    if (!R || !R.ep || !Array.isArray(R.ep.tasks)) return [];
+    var out = [];
+    R.ep.tasks.forEach(function (t) { if (t && t.mod && modOf(t.mod) && out.indexOf(t.mod) < 0) out.push(t.mod); });
+    return out;
+  }
+  /* 開いたときに出す手技：いまの業務。業務の外の会話なら、このあとの業務、無ければ直前の業務。 */
+  function refDefault() {
+    var t = task(), i, b, tt;
+    if (t && modOf(t.mod)) return t.mod;
+    for (i = R.bi; i < R.beats.length; i++) { b = R.beats[i]; tt = b && b.t != null ? R.ep.tasks[b.t] : null; if (tt && modOf(tt.mod)) return tt.mod; }
+    for (i = Math.min(R.bi, R.beats.length - 1); i >= 0; i--) { b = R.beats[i]; tt = b && b.t != null ? R.ep.tasks[b.t] : null; if (tt && modOf(tt.mod)) return tt.mod; }
+    var ms = refMods(), cb = R.beats[R.bi];
+    return (cb && (cb.key === 'close' || cb.k === 'epdone')) ? ms[ms.length - 1] : ms[0];
+  }
+  function refChap(id) {
+    var a = A(), cs = (a && a.CHAPTERS) || [];
+    for (var i = 0; i < cs.length; i++) if (cs[i].items.some(function (it) { return it.id === id; })) return i % 4;
+    return 0;
+  }
+  function refBuild() {
+    if (RV.el) return RV.el;
+    injectCss();
+    var w = el('div', 'rv');
+    w.id = 'sRv'; w.hidden = true;
+    w.innerHTML = '<div class="rv-bd" data-rvclose=""></div>' +
+      '<div class="rv-sheet" role="dialog" aria-modal="true" aria-labelledby="rvTitle">' +
+      '<div class="rv-head"><div class="rv-bar"><span class="rv-kick">資料</span><h2 id="rvTitle"></h2><span class="badge" id="rvBadge"></span>' +
+      '<button type="button" class="rv-x" id="rvX" aria-label="資料を閉じて、ストーリーに戻る">✕</button></div>' +
+      '<div class="rv-mods" id="rvMods" role="group" aria-label="この勤務の手技"></div>' +
+      '<div class="tabs rv-tabs" role="tablist">' + REF_TABS.map(function (x) { return '<button type="button" role="tab" data-rvtab="' + x[0] + '">' + x[1] + '</button>'; }).join('') + '</div></div>' +
+      '<div class="rv-body" id="rvBody"></div></div>';
+    document.body.appendChild(w);
+    w.querySelector('.rv-bd').addEventListener('click', function () { refClose(); });
+    w.querySelector('#rvX').addEventListener('click', function () { refClose(); });
+    w.querySelectorAll('[data-rvtab]').forEach(function (b) {
+      b.addEventListener('click', function () { if (RV.tab === b.dataset.rvtab) return; RV.tab = b.dataset.rvtab; haptic(); refPaint(); });
+    });
+    /* 覆いの中のタップは、下のストーリーに届かせない */
+    w.addEventListener('click', function (ev) { ev.stopPropagation(); });
+    RV.el = w;
+    return w;
+  }
+  function refOpen() {
+    if (!R) return;
+    var ms = refMods(); if (!ms.length) return;
+    RV.from = document.activeElement;
+    RV.mod = refDefault() || ms[0];
+    if (RV.tab === 'fig') RV.tab = 'steps';
+    refBuild(); RV.el.hidden = false;
+    var sh = RV.el.querySelector('.rv-sheet');
+    if (!reduced()) { RV.el.classList.remove('in'); void RV.el.offsetWidth; RV.el.classList.add('in'); }
+    refPaint();
+    q('#sRef').setAttribute('aria-expanded', 'true');
+    try { RV.el.querySelector('#rvX').focus({ preventScroll: true }); } catch (e) { /* 無視 */ }
+    return sh;
+  }
+  function refClose(quiet) {
+    if (!refIsOpen()) return;
+    RV.el.hidden = true;
+    RV.el.querySelector('#rvBody').innerHTML = '';   // 図の iframe も止める
+    if (root) { var rb = q('#sRef'); if (rb) rb.setAttribute('aria-expanded', 'false'); }
+    if (!quiet) {
+      var back = RV.from && RV.from.isConnected && RV.from !== document.body ? RV.from : (root && q('#sRef'));
+      try { if (back && back.focus) back.focus({ preventScroll: true }); } catch (e) { /* 無視 */ }
+    }
+    RV.from = null;
+  }
+  function refPaint() {
+    var w = RV.el, id = RV.mod, m = modOf(id);
+    if (!w || !m) return;
+    w.querySelector('.rv-sheet').setAttribute('data-chap', refChap(id));
+    w.querySelector('#rvTitle').textContent = modTitle(id);
+    var bd = typeof m.badge === 'function' ? m.badge() : m.badge, bdg = w.querySelector('#rvBadge');
+    bdg.textContent = bd || ''; bdg.hidden = !bd;
+    var ms = refMods(), mods = w.querySelector('#rvMods');
+    mods.hidden = ms.length < 2;
+    mods.innerHTML = ms.length < 2 ? '' : ms.map(function (k) {
+      var cur = task(), here = cur && cur.mod === k;
+      return '<button type="button" class="chip" data-rvmod="' + esc(k) + '" aria-pressed="' + (k === id) + '">' + (here ? '<i class="rv-now">いま</i>' : '') + esc(modTitle(k)) + '</button>';
+    }).join('');
+    mods.querySelectorAll('[data-rvmod]').forEach(function (b) {
+      b.addEventListener('click', function () { if (RV.mod === b.dataset.rvmod) return; RV.mod = b.dataset.rvmod; haptic(); refPaint(); });
+    });
+    var on = mods.querySelector('[aria-pressed="true"]');
+    if (on && on.scrollIntoView) { try { on.scrollIntoView({ block: 'nearest', inline: 'nearest' }); } catch (e) { /* 無視 */ } }
+    w.querySelectorAll('[data-rvtab]').forEach(function (b) { b.setAttribute('aria-selected', String(b.dataset.rvtab === RV.tab)); });
+    var body = w.querySelector('#rvBody');
+    body.innerHTML = '';
+    body.scrollTop = 0;
+    var fn = { steps: refSteps, parts: refParts, news: refNews, fig: refFig }[RV.tab] || refSteps;
+    fn(body, m, id);
+  }
+  /* 手順：題・すること・なぜ・最新の推奨。問い（q・ok・ng）は出さない。 */
+  function refSteps(body, m) {
+    var ss = Array.isArray(m.steps) ? m.steps : [];
+    body.innerHTML = '<section class="sheet rv-sec"><p class="lead">手技の手順と、それぞれの理由。答え合わせの問いは出しません。</p>' +
+      (ss.length ? '<ol class="rv-steps">' + ss.map(function (s, i) {
+        return '<li><div class="stephead"><span class="stepno">STEP ' + (i + 1) + '/' + ss.length + '</span><h3>' + (s.t || '') + '</h3></div>' +
+          (s.do && s.do.length ? '<ol class="do">' + s.do.map(function (d) { return '<li>' + d + '</li>'; }).join('') + '</ol>' : '') +
+          (s.why ? '<div class="rv-why"><b>なぜ</b><span>' + s.why + '</span></div>' : '') +
+          (s.upd ? '<div class="upd"><b>最新の推奨：</b>' + s.upd + '</div>' : '') + '</li>';
+      }).join('') + '</ol>' : '<p class="note">手順の資料はまだありません。</p>') + '</section>';
+  }
+  /* 物品：parts の配列（cards・table・kit・text）を、読むだけの形で並べる。 */
+  function refCell(c) { var mm = /^(#[0-9a-fA-F]{3,8})\|(.*)$/.exec(String(c)); return mm ? '<span class="sw" style="background:' + mm[1] + '"></span>' + mm[2] : c; }
+  function refParts(body, m) {
+    var ps = m.parts;
+    if (typeof ps === 'function') {
+      /* 留置針・採血は手技の画面の物品タブ（関数）をそのまま使う。画面を描き直す行のタップと、チェック欄は止める。 */
+      var node = null;
+      try { node = ps(); } catch (e) { node = null; }
+      if (!node) { body.innerHTML = '<section class="sheet rv-sec"><p class="note">物品の資料を開けませんでした。</p></section>'; return; }
+      var box = el('div', 'rv-fparts');
+      box.appendChild(node);
+      box.addEventListener('click', function (ev) { if (ev.target.closest && ev.target.closest('tr[data-g]')) { ev.stopPropagation(); ev.preventDefault(); } }, true);
+      box.querySelectorAll('.check input').forEach(function (x) { x.disabled = true; });
+      box.querySelectorAll('.sheet .lead').forEach(function (x) { if (/チェックはこの端末に保存/.test(x.textContent)) x.remove(); x.textContent = x.textContent.replace('行をタップすると上の図の色が変わります。', ''); });
+      box.querySelectorAll('tr[data-g]').forEach(function (x) { x.removeAttribute('data-g'); });
+      body.appendChild(box);
+      return;
+    }
+    if (!Array.isArray(ps) || !ps.length) { body.innerHTML = '<section class="sheet rv-sec"><p class="note">物品の資料はまだありません。</p></section>'; return; }
+    body.innerHTML = ps.map(function (s) {
+      var head = '<h3 class="rv-h">' + (s.h || (s.type === 'kit' ? 'そろえる物品' : '')) + '</h3>' + (s.lead && s.type !== 'kit' ? '<p class="lead">' + s.lead + '</p>' : '');
+      if (s.type === 'cards') {
+        return '<section class="sheet rv-sec">' + head + (s.pic ? '<img class="rv-over" src="' + esc(s.pic) + '" alt="" loading="lazy">' : '') +
+          '<ul class="rv-cards">' + (s.items || []).map(function (it) {
+            return '<li>' + (it[2] ? '<img src="' + esc(it[2]) + '" alt="" loading="lazy">' : '') + '<div><b>' + it[0] + '</b><p>' + (it[1] || '') + '</p></div></li>';
+          }).join('') + '</ul></section>';
+      }
+      if (s.type === 'table') {
+        return '<section class="sheet rv-sec">' + head + '<div class="tablewrap"><table class="gtable gen"><thead><tr>' + (s.head || []).map(function (x) { return '<th>' + x + '</th>'; }).join('') + '</tr></thead><tbody>' +
+          (s.rows || []).map(function (r) { return '<tr>' + r.map(function (c, k) { return '<td class="' + (k === 0 ? 'mono' : '') + '">' + (k === 0 ? '<b>' + refCell(c) + '</b>' : refCell(c)) + '</td>'; }).join('') + '</tr>'; }).join('') +
+          '</tbody></table></div>' + (s.note ? '<p class="note">' + s.note + '</p>' : '') + '</section>';
+      }
+      if (s.type === 'kit') {
+        return '<section class="sheet rv-sec">' + head + '<ul class="rv-kit">' + (s.items || []).map(function (k) { return '<li><b>' + k[0] + '</b>' + (k[1] ? '<small>' + k[1] + '</small>' : '') + '</li>'; }).join('') + '</ul></section>';
+      }
+      return '<section class="sheet rv-sec">' + head + (s.html ? '<div class="rv-text">' + s.html + '</div>' : '') + '</section>';
+    }).join('');
+  }
+  /* 根拠：updates（見出し・いまの推奨・補足・出典） */
+  function refNews(body, m) {
+    var us = Array.isArray(m.updates) ? m.updates : [];
+    body.innerHTML = '<section class="sheet rv-sec"><h3 class="rv-h">根拠と出典</h3><p class="lead">手技の内容の根拠です。2026年10月時点の資料で確認しました。</p>' +
+      (us.length ? us.map(function (u) {
+        return '<div class="chg"><h3>' + (u.h || '') + '</h3><div>' + (u.now || '') + '</div>' + (u.note ? '<div class="note">' + u.note + '</div>' : '') +
+          (u.src && u.src.length ? '<div class="src">出典：' + u.src.map(function (s) { return '<a href="' + esc(s[1]) + '" target="_blank" rel="noopener">' + s[0] + '</a>'; }).join('／') + '</div>' : '') + '</div>';
+      }).join('') : '<p class="note">根拠の資料はまだありません。</p>') + '</section>';
+  }
+  /* 図：手技の画面の Fig 1（modules/<id>.html）を、この覆いの中に出す。 */
+  function refFig(body, m) {
+    if (!m.fig || !m.fig[0]) { body.innerHTML = '<section class="sheet rv-sec"><p class="note">この手技の図はまだありません。</p></section>'; return; }
+    body.innerHTML = '<section class="simcard rv-fig"><div class="simhead"><b>' + esc(m.fig[1] || '') + '</b><span>' + esc(m.figHint || '図をドラッグ、またはボタンで段階を進める') + '</span></div>' +
+      '<iframe src="' + esc(m.fig[0]) + '" title="' + esc(m.fig[1] || '図') + '" style="height:' + (+m.figH || 760) + 'px"></iframe></section>';
+    var ifr = body.querySelector('iframe');
+    ifr.addEventListener('load', function () {
+      try {
+        var d = ifr.contentDocument, fit = function () { var hh = d.documentElement.scrollHeight; if (hh > 200) ifr.style.height = hh + 'px'; };
+        fit(); if (window.ResizeObserver) new ResizeObserver(fit).observe(d.body);
+      } catch (e) { /* 読めなければ figH のまま */ }
+    });
+  }
+
   /* ---------- index.html から呼ばれる入口 ---------- */
   function titleButton() {
     return '<button class="tbtn" data-t="story"><img src="' + art('mascot_happy') + '" alt=""><span><b>勤務表</b><i>' + (seen('prologue') ? '勤務を選んで遊ぶ・ふりかえる' : 'ストーリーの勤務の一覧') + '</i></span></button>';
@@ -1132,7 +1315,8 @@
     exp: function (id) { return !!P.exp[id]; },
     /* 動作確認用 */
     _state: function () { return { P: P, PL: PL, R: R ? { ep: R.ep.id, bi: R.bi, li: R.li, mode: R.mode, beat: R.beats[R.bi] } : null, RET: RET }; },
-    _notebook: notebook
+    _notebook: notebook,
+    _ref: function () { return refIsOpen() ? { mod: RV.mod, tab: RV.tab } : null; }
   };
 
   /* ---------- 見た目 ---------- */
@@ -1389,6 +1573,51 @@
       '.hub-hero img{display:block;width:100%;height:100%;object-fit:cover}',
       '.hub-top.has-hero .hub-doc{height:150px;bottom:-30px}',
       '@media (max-height:700px){.sstage{bottom:150px}.stext{font-size:15px;line-height:1.65}.sbox{min-height:124px}}',
+      /* ---- 資料（上の帯のボタンと、覆い） ---- */
+      '.sref{flex:none;display:inline-flex;align-items:center;gap:3px;font:800 12px/1 var(--f-body);color:var(--ink);background:#FFF8EE;border:2px solid var(--gline);border-radius:999px;padding:0 10px 0 8px;height:34px;cursor:pointer;box-shadow:0 2px 0 rgba(46,37,69,.35)}',
+      '.sref svg{width:15px;height:15px;color:#3557D6}.sref:active{transform:translateY(2px);box-shadow:none}.sref[hidden]{display:none}',
+      '.rv{position:fixed;inset:0;z-index:98;cursor:default;color:var(--ink);font:500 15px/1.7 var(--f-body);-webkit-tap-highlight-color:transparent}',
+      '.rv[hidden]{display:none}',
+      '.rv-bd{position:absolute;inset:0;background:rgba(40,26,58,.5)}',
+      '.rv-sheet{position:absolute;left:50%;transform:translateX(-50%);bottom:0;top:max(30px,calc(env(safe-area-inset-top,0px) + 12px));width:min(640px,100%);display:flex;flex-direction:column;background:var(--bg,#FFF3E4);border:3px solid var(--gline);border-bottom:0;border-radius:22px 22px 0 0;box-shadow:0 -10px 34px rgba(20,10,40,.35);overflow:hidden}',
+      '.rv-head{flex:none;background:#fff;border-bottom:3px solid var(--gline);padding:10px 12px 10px;display:flex;flex-direction:column;gap:8px;box-shadow:0 3px 0 rgba(46,37,69,.1)}',
+      '.rv-bar{display:flex;align-items:center;gap:8px;min-width:0}',
+      '.rv-kick{flex:none;font-size:11px;font-weight:800;color:#fff;background:#3557D6;border:2px solid var(--gline);border-radius:999px;padding:1px 8px;line-height:1.5}',
+      '.rv-bar h2{flex:1;min-width:0;margin:0;font-size:17px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
+      '.rv-bar .badge[hidden]{display:none}',
+      '.rv-x{flex:none;width:36px;height:36px;border-radius:50%;border:2.5px solid var(--gline);background:#fff;color:var(--ink);font:800 16px/1 var(--f-body);display:grid;place-items:center;cursor:pointer;box-shadow:0 2px 0 var(--glip)}',
+      '.rv-x:active{transform:translateY(2px);box-shadow:none}',
+      '.rv-mods{display:flex;gap:6px;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin:0 -12px;padding:2px 12px 4px}',
+      '.rv-mods::-webkit-scrollbar{display:none}.rv-mods[hidden]{display:none}',
+      '.rv-mods .chip{flex:none;white-space:nowrap;margin:0;font-size:12.5px;display:inline-flex;align-items:center;gap:4px}',
+      '.rv-mods .chip[aria-pressed="true"]{background:var(--chap);color:#fff}',
+      '.rv-now{font-style:normal;font-size:10px;font-weight:800;line-height:1.4;color:#fff;background:#E0457A;border-radius:999px;padding:0 5px}',
+      '.rv-tabs button{font-size:13px;padding:5px 2px;white-space:nowrap}',
+      '.rv-body{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:12px 12px calc(24px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:12px;-webkit-user-select:text;user-select:text}',
+      '.rv-body>*{flex:none;min-width:0}.rv-fparts>.sec{display:flex;flex-direction:column;gap:12px;margin:0;padding:0}',
+      '.rv-sec{padding:14px}.rv-h{margin:0;font-size:16px}',
+      '.rv-steps{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-direction:column}',
+      '.rv-steps>li{padding:4px 0 14px;border-bottom:2px dashed var(--line)}.rv-steps>li:last-child{border-bottom:0;padding-bottom:0}',
+      '.rv-steps .stephead h3{margin:0;font-size:16px;line-height:1.35;min-width:0}',
+      '.rv-steps .do{font-size:14px;line-height:1.6}.rv-steps .do li{margin:2px 0;overflow-wrap:anywhere}',
+      '.rv-why{margin-top:8px;padding:8px 12px;border-radius:14px;background:var(--panel2);border:2.5px solid var(--gline);font-size:13.5px;line-height:1.65}',
+      '.rv-why b{display:inline-block;margin-right:6px;font-size:11px;font-weight:800;color:#fff;background:var(--ok,#12A877);border-radius:999px;padding:0 8px;line-height:1.6;vertical-align:1px}',
+      '.rv-cards{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}',
+      '.rv-cards li{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border-radius:14px;background:var(--panel2);border:2px solid var(--line)}',
+      '.rv-cards img{flex:none;width:68px;height:52px;object-fit:contain;border-radius:8px;background:#fff;border:1.5px solid var(--line)}',
+      '.rv-cards div{min-width:0}.rv-cards b{display:block;font-size:14px;line-height:1.4}.rv-cards p{margin:2px 0 0;font-size:13px;line-height:1.55;color:var(--ink-2);overflow-wrap:anywhere}',
+      '.rv-over{display:block;width:100%;max-height:200px;object-fit:contain;margin-top:8px;border-radius:12px;background:#f6f6f3}',
+      '.rv-kit{list-style:none;margin:6px 0 0;padding:0}.rv-kit li{padding:7px 2px;border-bottom:2px dashed var(--line);font-size:14px;line-height:1.5}.rv-kit li:last-child{border-bottom:0}',
+      '.rv-kit b{font-weight:700}.rv-kit small{display:block;color:var(--ink-3);font-size:12px}',
+      '.rv-text{margin-top:8px;font-size:14px}',
+      '.rv-body .tablewrap{max-width:100%}.rv-body .chg{overflow-wrap:anywhere}',
+      '.rv-fparts .check input:disabled{opacity:.35}.rv-fparts .check label{cursor:default}',
+      '.rv-fig iframe{display:block;width:100%;border:0;background:#f2f2ef}',
+      '.rv.in .rv-bd{animation:rvFade .2s ease-out}.rv.in .rv-sheet{animation:rvUp .3s cubic-bezier(.2,1,.4,1)}',
+      '@keyframes rvFade{from{opacity:0}to{opacity:1}}',
+      '@keyframes rvUp{from{transform:translate(-50%,40px);opacity:0}to{transform:translateX(-50%);opacity:1}}',
+      '@media (max-width:360px){.sref{padding:0 8px 0 6px}.sref svg{display:none}}',
+      '@media (prefers-reduced-motion:reduce){.rv.in .rv-bd,.rv.in .rv-sheet{animation:none}}',
       '@media (prefers-reduced-motion:reduce){.sfig.enter,.sfig.duo .cs.in,.scard,.snext,.scard::after,.sbg.swap,.sbox.enter,.spanel .sin,.sband,.sband.swap>*,.cg-img,.sband.talk .sc-plate,.sc-puku,.sc-puku.hop,.res-badge.pop,.res-badge.pop .res-stars i{animation:none}}'
     ].join('\n');
     var st = document.createElement('style'); st.id = 'storyCss'; st.textContent = css;
