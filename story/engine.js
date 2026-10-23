@@ -247,7 +247,7 @@
     return { key: key, track: track };
   }
   function track() {
-    if (!root || root.hidden) return null;
+    if (!root || (root.hidden && !STUDY)) return null;   /* 勉強するで手技の画面を見ているあいだも、ストーリーの曲を流したまま */
     if (!R) return 'day';
     var b = bgAt();
     return b.track || R.ep.time || 'day';
@@ -1182,7 +1182,7 @@
   window.SHUGI_STORY_UI = {
     titleButton: titleButton, goInfo: goInfo, isLast: isLast,
     open: open, resume: resume,
-    active: function () { return !!root && !root.hidden; },
+    active: function () { return !!root && (!root.hidden || !!STUDY); },
     track: track, back: backFromMod, retLabel: retLabel, onOpenMod: onOpenMod,
     exp: function (id) { return !!P.exp[id]; },
     /* 動作確認用 */
